@@ -1,0 +1,40 @@
+---
+description: Research-to-build loop for fast AGI product iteration in Cursor.
+alwaysApply: false
+---
+
+# AGI Research and Build
+
+Use this rule when exploring unknowns, new architecture, or tool/plugin strategy.
+
+## Research Discipline
+
+- Research only what is needed for the next implementation decision.
+- Prefer primary docs and concrete examples over opinion threads.
+- Turn every research finding into a build action or a rejected option.
+
+## Build Conversion Loop
+
+1. Question to answer
+2. Evidence gathered
+3. Decision taken
+4. Implementation task created
+5. Validation criteria defined
+
+No open-ended research without execution output.
+
+## Plugin and Tool Strategy
+
+When selecting integrations:
+- prioritize reliability and low operational burden
+- avoid overlapping tools with unclear ownership
+- document why each integration exists
+
+## Product Focus
+
+Always tie technical choices to one of:
+- faster build velocity
+- better model/tool orchestration
+- stronger reliability/security
+- improved user-facing capability
+

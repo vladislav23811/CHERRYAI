@@ -1,0 +1,51 @@
+---
+description: Structured execution engine for autonomous feature delivery.
+alwaysApply: false
+---
+
+# AGI Execution Engine
+
+## Execution Framework
+
+For tasks above trivial complexity, follow exactly:
+
+1. **Define**
+   - Goal
+   - Constraints
+   - Acceptance criteria
+   - Non-goals
+
+2. **Design**
+   - 2-3 implementation options
+   - Chosen option with tradeoffs
+   - Rollout plan (small steps)
+
+3. **Deliver**
+   - Implement one small step at a time
+   - Keep diffs reviewable
+   - Maintain backward compatibility unless told otherwise
+
+4. **Defend**
+   - Add/adjust tests for new logic and edge cases
+   - Validate lint/type/test paths for touched areas
+   - Verify no obvious security/performance regressions
+
+5. **Debrief**
+   - Files changed and why
+   - Validation results
+   - Risks and follow-up tasks
+
+## Task Prioritization Rule
+
+When scope is large:
+- deliver highest-impact, lowest-risk slice first
+- avoid speculative abstractions
+- leave clear extension points for phase 2
+
+## Failure Handling
+
+If blocked:
+- report the exact blocker
+- provide at least one workaround
+- continue with independent tasks while waiting
+
