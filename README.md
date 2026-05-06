@@ -30,11 +30,21 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
 
 1. Clone this repository and open it in Cursor.
 2. Enable rule files from `.cursor/rules`.
-3. Start with `cherryail-master.mdc`.
+3. Start with `cherryai-agi-ultra.mdc` (current strongest prompt) or `cherryail-master.mdc`.
 4. Add AGI rule layers based on the task:
    - `agi-genie-core.mdc`
    - `agi-execution-engine.mdc`
 5. Use prompts from `.cursor/AGI-OPERATIONS.md`.
+
+## Current Master Prompt (May 6, 2026)
+
+Canonical prompt file:
+
+- `.cursor/rules/cherryai-agi-ultra.mdc`
+
+Companion playbook:
+
+- `.cursor/AGI-GENIE-PLAYBOOK.md`
 
 ## Recommended Rule Stacks
 
@@ -42,7 +52,7 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
   - `cherryail-master.mdc`
   - `cherryail-project-ops.mdc`
 - **Autonomous Ship**
-  - `cherryail-master.mdc`
+  - `cherryai-agi-ultra.mdc`
   - `agi-genie-core.mdc`
   - `agi-execution-engine.mdc`
 - **Strict Engineering**
