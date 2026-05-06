@@ -4,6 +4,8 @@ Welcome to the **MZ AI** Plugin and Feature development guide!
 
 With MZ AI operating as your autonomous genie inside Cursor, you can easily bootstrap new plugins and features for your projects. 
 
+See also **`docs/PLUGIN-TOOL-MATRIX.md`** for how plugins fit with Cursor rules, MCP, and npm scripts.
+
 ## Creating a New Plugin / Feature
 
 To create a new plugin, use the provided `plugin-session.md` template from the `.cursor/templates` directory. 

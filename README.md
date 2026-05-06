@@ -20,6 +20,7 @@ MZ AI turns Cursor into a high-velocity AGI build environment through production
 .cursor/
   AGI-OPERATIONS.md               # prompt kit + operating playbooks
   AGI-GENIE-PLAYBOOK.md           # advanced autonomous + swarm workflows
+  MULTI-AGENT-ORCHESTRATION.md    # coordinator + specialist playbooks for AUTO mode
   rules/
     cherryail-master.mdc          # balanced default profile
     cherryail-compact.mdc         # lightweight daily profile
@@ -40,6 +41,7 @@ MZ AI turns Cursor into a high-velocity AGI build environment through production
    - `agi-genie-core.mdc`
    - `agi-execution-engine.mdc`
 5. Use prompts from `.cursor/AGI-OPERATIONS.md`.
+6. For parallel AUTO workflows see `.cursor/MULTI-AGENT-ORCHESTRATION.md` and `docs/PLUGIN-TOOL-MATRIX.md`.
 
 ## Local Automation
 

@@ -69,6 +69,16 @@ Risks: <known issues or assumptions>
 Next: <best next 1-3 actions>
 ```
 
+## 7) Multi-Agent Orchestration (AUTO mode)
+
+For coordinator + specialist patterns and parallel tracks:
+
+- `.cursor/MULTI-AGENT-ORCHESTRATION.md`
+
+For what plugs into what (rules, scripts, MCP, templates):
+
+- `docs/PLUGIN-TOOL-MATRIX.md`
+
 ## Operating Rhythm
 
 - Start session: pick a rule combo (see README) + set milestone.

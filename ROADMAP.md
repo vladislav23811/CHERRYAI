@@ -17,8 +17,8 @@
 
 ## v0.3 - Agentic Scale
 
-- [ ] Multi-agent orchestration playbooks
-- [ ] Plugin/tool integration matrix and guidance
+- [x] Multi-agent orchestration playbooks
+- [x] Plugin/tool integration matrix and guidance
 - [ ] Reliability and security hardening checklist
 - [ ] CI-backed quality gates for shared contributions
 
