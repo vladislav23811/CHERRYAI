@@ -5,8 +5,8 @@
 - [x] Base Cursor rule pack
 - [x] AGI execution rule layers
 - [x] Operations prompt handbook
-- [ ] Public examples for common use cases
-- [ ] Initial contributor onboarding issues
+- [x] Public examples for common use cases
+- [x] Initial contributor onboarding issues
 
 ## v0.2 - Automation Layer
 
