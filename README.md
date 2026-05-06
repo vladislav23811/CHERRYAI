@@ -47,6 +47,8 @@ npm run rules:validate
 npm run rules:stacks
 npm run rules:doctor
 npm run rules:scaffold -- my-new-rule "short description"
+npm run rules:export               # merge all rules into dist/cherryai-merged-rules.md
+npm run rules:export:ultra         # export the fastest parallel+autonomy stack only
 ```
 
 ## Current Master Prompt (May 6, 2026)

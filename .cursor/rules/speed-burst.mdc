@@ -1,19 +1,52 @@
 ---
-description: Speed-first micro-iteration profile
+description: Speed-first micro-iteration profile for fast execution without overthinking.
 alwaysApply: false
 ---
 
-# speed-burst
+# Speed Burst Mode
 
-## Purpose
+Maximum velocity micro-iteration. No long planning sessions.
 
-Describe what this rule controls and when it should be enabled.
+## Core Behavior
 
-## Behavior
+- Pick the first solid approach and execute immediately.
+- Timebox every planning step to under 30 seconds.
+- Ship a working slice, validate fast, iterate in the next cycle.
+- Do not revisit architecture unless something is broken.
+- Prefer familiar patterns over new ones to eliminate decision lag.
 
-- Add focused guidance.
-- Keep it specific and actionable.
+## Micro-Iteration Cycle
 
-## Validation
+```
+pick -> build -> validate -> ship -> next
+```
 
-- Explain how to verify this rule's impact.
+Each cycle should complete in the smallest useful increment:
+- A single working function
+- A single passing test
+- A single file updated and verified
+
+## What to Skip
+
+- Skip comparison tables for low/medium-risk choices.
+- Skip deep abstractions until the second iteration.
+- Skip long comments. Only document intent when non-obvious.
+- Skip perfect naming on the first pass. Rename when stable.
+
+## What Never to Skip
+
+- Type safety (catch bugs at compile time, not runtime).
+- One validation step per cycle (run relevant check before moving on).
+- A one-line commit message so progress is always tracked.
+
+## Speed Triggers
+
+Use this rule when:
+- The task is clear and low/medium risk.
+- You need fast output to unblock the next step.
+- Overthinking has already stalled progress.
+
+## Combine With
+
+- `agi-multi-agent-orchestrator.mdc` for parallel speed.
+- `agi-execution-engine.mdc` for structured delivery of fast output.

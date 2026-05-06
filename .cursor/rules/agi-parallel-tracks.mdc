@@ -1,0 +1,54 @@
+---
+description: Parallel execution tracks for splitting work across autonomous specialist agents.
+alwaysApply: false
+---
+
+# AGI Parallel Tracks
+
+Split every task that can be split. Run tracks simultaneously.
+
+## Track Definitions
+
+Every complex task gets decomposed into independent execution tracks:
+
+| Track | Owner | Focus |
+|---|---|---|
+| Architecture | Architect agent | Design, interfaces, contracts |
+| Implementation | Builder agent | Code, logic, integration |
+| Validation | Verifier agent | Tests, lint, type checks, regression |
+| Ops/Automation | Ops agent | Scripts, CI, workflows, docs |
+
+## Parallelization Decision Rule
+
+Split when tracks share no common write target in the current cycle.
+
+Do not split when:
+- Two tracks write to the same file at the same time.
+- A downstream track needs the output of an upstream track before it can start.
+
+## Merge Protocol
+
+1. Each track reports its deliverable and status.
+2. Coordinator validates no conflicts.
+3. Merge smallest working increment to main.
+4. Trigger next parallel batch.
+
+## Swarm Prompt Format
+
+When launching a parallel swarm, use this structure:
+
+```text
+Track: <name>
+Owner: <specialist type>
+Goal: <one sentence>
+Input: <what it needs>
+Output: <what it delivers>
+Merge condition: <when it's ready to merge>
+```
+
+## Speed Guarantee
+
+Parallel tracks eliminate sequential waiting time.
+The total wall-clock time should equal the slowest single track, not the sum of all tracks.
+
+Always ask: "What can I start right now while waiting for X?"
