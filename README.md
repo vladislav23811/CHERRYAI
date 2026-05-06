@@ -1,10 +1,10 @@
-# CHERRYAI
+# MZ AI
 
 Open-source Cursor framework for building autonomous "genie" style AI engineering workflows.
 
-CHERRYAI turns Cursor into a high-velocity AGI build environment through production-ready rules, execution loops, and operating playbooks.
+MZ AI turns Cursor into a high-velocity AGI build environment through production-ready rules, execution loops, and operating playbooks.
 
-## Why CHERRYAI
+## Why MZ AI
 
 - **Autonomous execution:** plan -> implement -> validate -> ship loops
 - **Quality first:** strict engineering standards and reviewable diffs
@@ -40,7 +40,7 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
 
 ## Local Automation
 
-Run local CHERRYAI toolkit commands:
+Run local MZ AI toolkit commands:
 
 ```bash
 npm run rules:validate
