@@ -47,7 +47,18 @@ Audit this project for Cursor productivity upgrades:
 Propose top 5 upgrades by impact/effort and implement the first 2 immediately.
 ```
 
-## 5) Milestone Debrief Template
+## 5) Repo Maintenance Prompt
+
+```text
+Audit the repository for maintenance tasks:
+1) Check for unused or outdated dependencies.
+2) Identify dead code or unused files.
+3) Review documentation for accuracy against the current codebase.
+4) Run all validation scripts (`npm run validate:all`).
+Propose a cleanup plan and execute the top 3 safest maintenance tasks.
+```
+
+## 6) Milestone Debrief Template
 
 ```text
 Milestone: <name>

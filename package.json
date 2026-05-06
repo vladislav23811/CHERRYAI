@@ -10,6 +10,8 @@
     "rules:doctor": "node scripts/rules-doctor.mjs",
     "rules:scaffold": "node scripts/scaffold-rule.mjs",
     "rules:export": "node scripts/export-rules.mjs",
-    "rules:export:ultra": "node scripts/export-rules.mjs cherryai-agi-ultra agi-multi-agent-orchestrator agi-parallel-tracks agi-autonomy-loop agi-execution-engine speed-burst"
+    "rules:export:ultra": "node scripts/export-rules.mjs cherryai-agi-ultra agi-multi-agent-orchestrator agi-parallel-tracks agi-autonomy-loop agi-execution-engine speed-burst",
+    "validate:all": "npm run rules:validate && npm run rules:doctor",
+    "validate:ci": "npm run validate:all"
   }
 }

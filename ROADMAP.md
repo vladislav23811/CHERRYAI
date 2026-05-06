@@ -10,10 +10,10 @@
 
 ## v0.2 - Automation Layer
 
-- [ ] Session templates for feature/debug/research modes
-- [ ] Validation command presets (type/lint/test bundles)
-- [ ] Prompt snippets for repo maintenance workflows
-- [ ] Standardized debrief logs for milestones
+- [x] Session templates for feature/debug/research modes
+- [x] Validation command presets (type/lint/test bundles)
+- [x] Prompt snippets for repo maintenance workflows
+- [x] Standardized debrief logs for milestones
 
 ## v0.3 - Agentic Scale
 
