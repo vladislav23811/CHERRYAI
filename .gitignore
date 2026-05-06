@@ -27,3 +27,6 @@ temp/
 
 # Node
 node_modules/
+
+# Generated plugin reports
+plugins/**/reports/*.json

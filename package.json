@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "description": "MZ AI Cursor rule framework toolkit",
+  "author": "vladislav23811",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {
     "rules:validate": "node scripts/validate-rules.mjs",
@@ -11,6 +13,9 @@
     "rules:scaffold": "node scripts/scaffold-rule.mjs",
     "rules:export": "node scripts/export-rules.mjs",
     "rules:export:ultra": "node scripts/export-rules.mjs cherryai-agi-ultra agi-multi-agent-orchestrator agi-parallel-tracks agi-autonomy-loop agi-execution-engine speed-burst",
+    "plugins:audit": "node scripts/self-evolution-audit.mjs",
+    "plugins:roadmap": "node scripts/roadmap-executor.mjs",
+    "plugins:loop": "npm run plugins:audit && npm run plugins:roadmap",
     "validate:all": "npm run rules:validate && npm run rules:doctor",
     "validate:ci": "npm run validate:all"
   }

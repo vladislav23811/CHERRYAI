@@ -4,6 +4,9 @@ Open-source Cursor framework for building autonomous "genie" style AI engineerin
 
 MZ AI turns Cursor into a high-velocity AGI build environment through production-ready rules, execution loops, and operating playbooks.
 
+> Copyright (c) 2026 vladislav23811. All rights reserved.
+> Personal use only. Commercial use is not allowed without explicit written permission and agreement to proposed commercial terms.
+
 ## Why MZ AI
 
 - **Autonomous execution:** plan -> implement -> validate -> ship loops
@@ -49,7 +52,17 @@ npm run rules:doctor
 npm run rules:scaffold -- my-new-rule "short description"
 npm run rules:export               # merge all rules into dist/cherryai-merged-rules.md
 npm run rules:export:ultra         # export the fastest parallel+autonomy stack only
+npm run plugins:audit              # run Plugin 001 self-evolution health audit
+npm run plugins:roadmap            # run Plugin 002 roadmap batch planner
+npm run plugins:loop               # run full self-evolution loop (audit + roadmap)
 ```
+
+## Self-Evolving Plugins
+
+- `plugins/self-evolution-audit`: repository health checks + improvement suggestions
+- `plugins/roadmap-executor`: converts open roadmap items into execution batches
+
+Use these scripts each session to keep MZ AI improving itself inside Cursor.
 
 ## Current Master Prompt (May 6, 2026)
 
@@ -102,4 +115,4 @@ See `ROADMAP.md` for upcoming milestones.
 
 ## License
 
-MIT - see `LICENSE`.
+Personal Use Only (non-commercial) - see `LICENSE`.

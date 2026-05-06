@@ -1,4 +1,4 @@
-# CHERRYAI Roadmap
+# MZ AI Roadmap
 
 ## v0.1 - Public Foundation
 
