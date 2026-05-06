@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "rules:validate": "node scripts/validate-rules.mjs",
-    "rules:stacks": "node scripts/print-stacks.mjs"
+    "rules:stacks": "node scripts/print-stacks.mjs",
+    "rules:doctor": "node scripts/rules-doctor.mjs",
+    "rules:scaffold": "node scripts/scaffold-rule.mjs"
   }
 }

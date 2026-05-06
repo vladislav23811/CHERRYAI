@@ -45,6 +45,8 @@ Run local CHERRYAI toolkit commands:
 ```bash
 npm run rules:validate
 npm run rules:stacks
+npm run rules:doctor
+npm run rules:scaffold -- my-new-rule "short description"
 ```
 
 ## Current Master Prompt (May 6, 2026)

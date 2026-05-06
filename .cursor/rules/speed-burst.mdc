@@ -1,0 +1,19 @@
+---
+description: Speed-first micro-iteration profile
+alwaysApply: false
+---
+
+# speed-burst
+
+## Purpose
+
+Describe what this rule controls and when it should be enabled.
+
+## Behavior
+
+- Add focused guidance.
+- Keep it specific and actionable.
+
+## Validation
+
+- Explain how to verify this rule's impact.
