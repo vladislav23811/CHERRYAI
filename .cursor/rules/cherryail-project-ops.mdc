@@ -1,0 +1,37 @@
+---
+description: CHERRYAIL project operations inspired by CHERRY conventions.
+alwaysApply: false
+---
+
+# CHERRYAIL Project Ops
+
+Operational guardrails inspired by CHERRY project rules.
+
+## Modular Discipline
+
+- Keep files focused and small.
+- If a file grows beyond ~300 lines and responsibilities diverge, split before adding more.
+- Prefer one responsibility per module and clear file naming by behavior.
+
+## Change Tracking
+
+For non-trivial features:
+- Maintain a short feature note (scope, files, rationale, current status).
+- Append dated changelog bullets for material updates.
+- Keep progress honest; if regressions are found, lower status and document why.
+
+## Cross-Platform Care
+
+- Verify behavior on Windows/macOS/Linux-sensitive paths, shell commands, and filesystem assumptions.
+- Avoid platform-specific shortcuts unless guarded.
+
+## Comment Policy
+
+- Comment only non-obvious intent and tradeoffs.
+- Avoid narration comments.
+
+## Safety Baseline
+
+- No silent fallback that hides critical failures.
+- Prefer explicit error messages and actionable recovery paths.
+
