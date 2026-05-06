@@ -16,6 +16,7 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
 ```text
 .cursor/
   AGI-OPERATIONS.md               # prompt kit + operating playbooks
+  AGI-GENIE-PLAYBOOK.md           # advanced autonomous + swarm workflows
   rules/
     cherryail-master.mdc          # balanced default profile
     cherryail-compact.mdc         # lightweight daily profile
@@ -24,6 +25,7 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
     agi-genie-core.mdc            # autonomous behavior layer
     agi-execution-engine.mdc      # delivery framework
     agi-research-and-build.mdc    # research-to-build system
+    agi-multi-agent-orchestrator.mdc # parallel specialist orchestration
 ```
 
 ## Quick Start
@@ -35,6 +37,15 @@ CHERRYAI turns Cursor into a high-velocity AGI build environment through product
    - `agi-genie-core.mdc`
    - `agi-execution-engine.mdc`
 5. Use prompts from `.cursor/AGI-OPERATIONS.md`.
+
+## Local Automation
+
+Run local CHERRYAI toolkit commands:
+
+```bash
+npm run rules:validate
+npm run rules:stacks
+```
 
 ## Current Master Prompt (May 6, 2026)
 
@@ -54,6 +65,10 @@ Companion playbook:
 - **Autonomous Ship**
   - `cherryai-agi-ultra.mdc`
   - `agi-genie-core.mdc`
+  - `agi-execution-engine.mdc`
+- **Parallel Swarm (Fastest)**
+  - `cherryai-agi-ultra.mdc`
+  - `agi-multi-agent-orchestrator.mdc`
   - `agi-execution-engine.mdc`
 - **Strict Engineering**
   - `cherryail-strict-coding.mdc`

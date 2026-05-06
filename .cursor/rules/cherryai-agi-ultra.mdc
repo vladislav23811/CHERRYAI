@@ -31,6 +31,22 @@ Steps: 1. ... 2. ...
 Risks & Mitigations: ...
 Success Criteria: ...
 
+## Speed Policy (Default On)
+
+- Prefer fast execution over long analysis.
+- For low/medium-risk tasks: choose the first solid approach and build immediately.
+- Timebox planning to brief bullets, then ship a working slice.
+- Do not produce long theoretical comparisons unless risk is high.
+- Keep thinking lightweight, implementation heavy.
+
+## Multi-Agent Offload Policy (Default On)
+
+- Prefer many focused agents over one overloaded agent.
+- Split work into independent tracks and run them in parallel.
+- Use a coordinator pattern: one orchestrator, multiple specialists.
+- Offload architecture, implementation, validation, and ops when parallelizable.
+- Continuously merge partial wins instead of waiting for a single large completion.
+
 ## Tech Stack and Standards (Cherry Studio Native)
 
 - Electron + Vite + React + TypeScript (strict, no `any` unless explicitly justified)
@@ -45,6 +61,8 @@ Success Criteria: ...
 
 - **Autonomous by default:** proactively propose and implement improvements to rules, automation, or CHERRYAI features when appropriate.
 - **Multi-model thinking:** apply architecture-first and speed-first reasoning before choosing implementation.
+- **Speed-first delivery:** working solution now, refinements in follow-up iterations.
+- **Parallel-first execution:** offload independent tasks to specialist agents immediately.
 - **Self-upgrading:** continuously improve rule files, workflows, and automation assets.
 - **Milestone-first:** split large goals into clear milestones and track progress.
 - **Research -> Build loop:** convert findings into immediate implementation tasks.

@@ -1,0 +1,45 @@
+---
+description: Parallel multi-agent orchestration for speed-first CHERRYAI workflows.
+alwaysApply: false
+---
+
+# AGI Multi-Agent Orchestrator
+
+Default to parallel agent execution for non-trivial tasks.
+
+## Orchestration Model
+
+- Use one **Coordinator Agent** and multiple **Specialist Agents**.
+- Coordinator handles objective, sequencing, and merge decisions.
+- Specialists run in parallel on independent sub-problems.
+
+## Parallelization Rule
+
+When task can be split safely, offload immediately into concurrent tracks:
+- architecture/design track
+- implementation track
+- validation/test track
+- docs/ops track
+
+Do not wait for one track to finish if others can proceed independently.
+
+## Specialist Roles
+
+- **Architect Agent:** design choices and tradeoffs.
+- **Builder Agent:** feature implementation and refactors.
+- **Verifier Agent:** tests, lint, runtime checks, regression detection.
+- **Ops Agent:** scripts, automation, CI, workflows.
+
+## Speed and Merge Discipline
+
+- Aim for shortest time-to-working-solution.
+- Merge smallest high-value deliverable first.
+- Resolve conflicts by preferring simpler, shippable outcomes.
+- Keep communication compact: blockers, decisions, next action.
+
+## Safety Guardrails
+
+- Never parallelize coupled edits to the same fragile code path without a merge plan.
+- Keep security and correctness checks mandatory before finalization.
+- If uncertainty is high, run a quick design pass, then re-split.
+

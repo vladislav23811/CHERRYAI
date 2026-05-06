@@ -1,0 +1,11 @@
+{
+  "name": "cherryai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CHERRYAI Cursor rule framework toolkit",
+  "type": "module",
+  "scripts": {
+    "rules:validate": "node scripts/validate-rules.mjs",
+    "rules:stacks": "node scripts/print-stacks.mjs"
+  }
+}

@@ -51,3 +51,27 @@ Recommended stack:
 
 Use this when you want maximum autonomous output with disciplined structure.
 
+## 6) Parallel Agent Swarm Mode
+
+```text
+Mode: Multi-agent parallel swarm.
+Coordinator objective: <one sentence>.
+Split into 4 concurrent tracks:
+1) architecture
+2) implementation
+3) validation/tests
+4) automation/docs
+Run all independent tracks in parallel.
+Merge smallest working increment first.
+Report: per-track output + merged outcome + next parallel batch.
+```
+
+## 7) Speed-First No-Overthinking Mode
+
+```text
+Prioritize speed over deep analysis for low/medium-risk tasks.
+Pick first solid approach, implement now, validate quickly, iterate.
+Use parallel specialists instead of one long sequential pass.
+Only expand analysis when risk or ambiguity is high.
+```
+
