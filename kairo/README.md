@@ -121,7 +121,9 @@ Quick sanity check without Cursor:
 
 ```bash
 node dist/cli.js doctor
-# or: kairo doctor
+node dist/cli.js doctor --json   # CI / scripts
+node dist/cli.js version
+# or: kairo doctor | kairo doctor --json | kairo version
 ```
 
 Environment:
@@ -137,7 +139,9 @@ The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` /
 ```text
 kairo mcp       # stdio MCP (default)
 kairo serve     # web halo + SSE
-kairo doctor    # env dump + health + model count
+kairo doctor       # env dump + health + model count
+kairo doctor --json   # machine-readable
+kairo version      # package semver
 kairo --help
 ```
 

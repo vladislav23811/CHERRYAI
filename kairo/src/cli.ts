@@ -3,9 +3,14 @@ async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const cmd = argv[0] ?? "mcp";
 
+  if (cmd === "version" || cmd === "-v" || cmd === "--version") {
+    const { readPackageVersion } = await import("./version-info.js");
+    console.log(readPackageVersion());
+    return;
+  }
   if (cmd === "doctor" || cmd === "check") {
     const { runDoctor } = await import("./doctor.js");
-    await runDoctor();
+    await runDoctor(argv.slice(1));
     return;
   }
   if (cmd === "serve" || cmd === "ui") {
@@ -24,6 +29,8 @@ async function main(): Promise<void> {
   kairo mcp          MCP server over stdio (default)
   kairo serve        Web UI + SSE streaming (port ${process.env.KAIRO_UI_PORT ?? "4747"})
   kairo doctor       Print env + probe inference backend (health + models)
+  kairo doctor --json   Machine-readable doctor output
+  kairo version      Print package version
   kairo --help
 
 Environment:
