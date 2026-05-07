@@ -2,8 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveModel } from "./model-utils.js";
-import { ollamaChatStream, ollamaHealth, ollamaListModels } from "./ollama.js";
+import { createInferenceBackend, resolveModelTag } from "./inference/index.js";
 import { SessionStore } from "./sessions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,7 +22,7 @@ async function readJsonBody(req: IncomingMessage): Promise<unknown> {
 }
 
 export async function runServe(): Promise<void> {
-  const baseUrl = process.env.KAIRO_OLLAMA_URL?.trim() || "http://127.0.0.1:11434";
+  const backend = createInferenceBackend();
   const port = Number(process.env.KAIRO_UI_PORT ?? "4747") || 4747;
   const sessions = new SessionStore(process.env.KAIRO_SESSION_DIR?.trim() || null);
 
@@ -53,22 +52,22 @@ export async function runServe(): Promise<void> {
       }
 
       if (req.method === "GET" && url === "/api/health") {
-        const h = await ollamaHealth(baseUrl);
+        const h = await backend.health();
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ...h, baseUrl }));
+        res.end(JSON.stringify({ ...h, backend: backend.kind, endpoint: backend.label }));
         return;
       }
 
       if (req.method === "GET" && url === "/api/models") {
-        const models = await ollamaListModels(baseUrl);
+        const models = await backend.listModels();
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ models, baseUrl }));
+        res.end(JSON.stringify({ models, backend: backend.kind, endpoint: backend.label }));
         return;
       }
 
       if (req.method === "POST" && url === "/api/session") {
         const body = (await readJsonBody(req)) as { model?: string };
-        const model = await resolveModel(baseUrl, body.model);
+        const model = await resolveModelTag(backend, body.model);
         if (!model) {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "No models available" }));
@@ -109,7 +108,7 @@ export async function runServe(): Promise<void> {
           model = fresh.model;
           chatMessages = [...fresh.messages, { role: "user" as const, content: message }];
         } else {
-          model = await resolveModel(baseUrl, body.model);
+          model = await resolveModelTag(backend, body.model);
           if (!model) {
             res.writeHead(400, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "no model" }));
@@ -128,7 +127,7 @@ export async function runServe(): Promise<void> {
 
         let full = "";
         try {
-          for await (const delta of ollamaChatStream({ baseUrl, model, messages: chatMessages })) {
+          for await (const delta of backend.chatStream(model, chatMessages)) {
             full += delta;
             res.write(`data: ${JSON.stringify({ delta })}\n\n`);
           }
@@ -158,9 +157,8 @@ export async function runServe(): Promise<void> {
 
   await new Promise<void>((resolve) => {
     server.listen(port, () => {
-      console.error(
-        `\n  Kairo UI  ~  http://127.0.0.1:${port}\n  Ollama    ~  ${baseUrl}\n`,
-      );
+      console.error(`\n  Kairo UI   ~  http://127.0.0.1:${port}`);
+      console.error(`  Inference  ~  ${backend.kind} @ ${backend.label}\n`);
       resolve();
     });
   });
