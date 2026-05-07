@@ -51,7 +51,7 @@ Cursor owns stdin/stdout for JSON-RPC — do **not** attach a TTY debugger there
 }
 ```
 
-Leave `KAIRO_SESSION_DIR` empty for RAM-only sessions, or set a folder path to persist `.json` session files across MCP restarts.
+Leave `KAIRO_SESSION_DIR` empty for RAM-only sessions, or set a folder path to persist `.json` session files across MCP restarts. Use the **same directory** in MCP env and when launching the UI if you want Cursor agents and the browser halo to **share** session IDs.
 
 ### MCP tools (v0.2)
 
