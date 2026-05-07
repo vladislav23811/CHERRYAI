@@ -82,7 +82,41 @@
     .msg { margin-bottom: 0.85rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
     .msg.user { color: var(--teal); border-left: 2px solid var(--teal); padding-left: 0.65rem; }
     .msg.ai { color: var(--text); border-left: 2px solid var(--gold); padding-left: 0.65rem; }
+    .msg.ai:has(.md) { white-space: normal; }
     .msg .who { font-size: 0.7rem; color: var(--mist); letter-spacing: 0.12em; margin-bottom: 0.25rem; }
+    .msg.ai .md {
+      font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.58;
+    }
+    .msg.ai .md > :first-child { margin-top: 0; }
+    .msg.ai .md > :last-child { margin-bottom: 0; }
+    .msg.ai .md pre {
+      margin: 0.65rem 0;
+      padding: 0.75rem 0.85rem;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.42);
+      border: 1px solid rgba(212, 168, 83, 0.22);
+      overflow-x: auto;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .msg.ai .md code {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.85em;
+      background: rgba(94, 234, 212, 0.09);
+      padding: 0.1em 0.38em;
+      border-radius: 4px;
+    }
+    .msg.ai .md pre code { background: none; padding: 0; font-size: inherit; }
+    .msg.ai .md a { color: var(--teal); text-decoration: underline; text-underline-offset: 2px; }
+    .msg.ai .md blockquote {
+      margin: 0.5rem 0;
+      padding-left: 0.75rem;
+      border-left: 3px solid var(--gold-dim);
+      color: var(--mist);
+    }
     textarea {
       width: 100%; min-height: 96px; resize: vertical; padding: 0.75rem;
       border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.2);
@@ -135,6 +169,7 @@
         <button type="button" id="send" disabled>Transmit</button>
         <button type="button" id="stopStream" class="stop" disabled title="Stop generation (Escape)">Halt</button>
         <button type="button" id="copyOrbit" title="Copy transcript as markdown">Copy orbit</button>
+        <button type="button" id="downloadOrbit" title="Save transcript as .md file">Download orbit</button>
         <button type="button" id="clearLog" title="Clear transcript (session unchanged)">Clear log</button>
         <div id="statusLine" class="status">Warming sensors…</div>
       </div>
@@ -147,9 +182,11 @@
     </div>
     <footer>
       Wire Cursor via MCP · <a href="https://github.com/vladislav23811/CHERRYAI/tree/main/kairo" target="_blank" rel="noopener">source</a>
-      · SSE → your local inference endpoint (Ollama or OpenAI-compatible)
+      · SSE → local inference · replies render as Markdown when CDN libs load
     </footer>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" crossorigin="anonymous"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     const logEl = $("log");
@@ -167,21 +204,44 @@
       statusLine.className = s.cls;
     }
 
+    function aiMessagePlaintext(el) {
+      const md = el.querySelector(".md");
+      if (md) return (md.innerText || "").trim();
+      const buf = el.querySelector(".buf");
+      if (buf) return (buf.textContent || "").trim();
+      const clone = el.cloneNode(true);
+      clone.querySelector(".who")?.remove();
+      return (clone.textContent || "").trim();
+    }
+
     function transcriptMarkdown() {
       const parts = [];
       logEl.querySelectorAll(".msg").forEach((el) => {
         const tag = el.classList.contains("user") ? "YOU" : "KAIRO";
-        const buf = el.querySelector(".buf");
-        let body = "";
-        if (buf) body = (buf.textContent || "").trim();
-        else {
+        const body = el.classList.contains("ai") ? aiMessagePlaintext(el) : (() => {
           const clone = el.cloneNode(true);
           clone.querySelector(".who")?.remove();
-          body = (clone.textContent || "").trim();
-        }
+          return (clone.textContent || "").trim();
+        })();
         if (body) parts.push(`### ${tag}\n\n${body}`);
       });
       return parts.join("\n\n");
+    }
+
+    function polishAiMarkdown(accEl, raw) {
+      const buf = accEl.querySelector(".buf");
+      if (!buf || !raw.trim()) return;
+      if (typeof marked === "undefined" || typeof DOMPurify === "undefined") return;
+      try {
+        const html = DOMPurify.sanitize(marked.parse(raw, { breaks: true }));
+        buf.remove();
+        const wrap = document.createElement("div");
+        wrap.className = "md";
+        wrap.innerHTML = html;
+        accEl.appendChild(wrap);
+      } catch (_) {
+        buf.textContent = raw;
+      }
     }
 
     function line(kind, text) {
@@ -283,6 +343,7 @@
           buf.textContent = "⚠ HTTP " + res.status + ": " + detail;
           return;
         }
+        let hadStreamError = false;
         const reader = res.body.getReader();
         const dec = new TextDecoder();
         let carry = "";
@@ -303,10 +364,15 @@
                 buf.textContent = acc;
                 logEl.scrollTop = logEl.scrollHeight;
               }
-              if (ev.error) buf.textContent = acc + (acc ? "\n\n" : "") + "⚠ " + ev.error;
+              if (ev.error) {
+                buf.textContent = acc + (acc ? "\n\n" : "") + "⚠ " + ev.error;
+                hadStreamError = true;
+              }
             } catch (_) {}
           }
         }
+        if (!hadStreamError && acc.trim()) polishAiMarkdown(accEl, acc);
+        else if (!hadStreamError && !acc.trim()) buf.textContent = "(empty reply)";
       } catch (e) {
         if (e.name === "AbortError") buf.textContent = acc ? acc + "\n\n… transmission halted" : "… transmission halted";
         else buf.textContent = (acc ? acc + "\n\n" : "") + "⚠ " + e.message;
@@ -359,6 +425,27 @@
       } catch (_) {
         line("ai", "Clipboard blocked — select transcript manually.");
       }
+    };
+
+    $("downloadOrbit").onclick = () => {
+      const md = transcriptMarkdown();
+      if (!md) {
+        statusLine.textContent = "Nothing to save yet";
+        statusLine.className = "status";
+        setTimeout(() => refreshModels(), 1400);
+        return;
+      }
+      const stamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "kairo-orbit-" + stamp + ".md";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      const prev = snapshotStatus();
+      statusLine.textContent = "Orbit saved · .md";
+      statusLine.className = "status ok";
+      setTimeout(() => applyStatus(prev), 1400);
     };
 
     $("clearLog").onclick = () => {

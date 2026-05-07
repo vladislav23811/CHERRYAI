@@ -115,7 +115,7 @@ npm run start:ui
 # after npm link in this folder: kairo serve
 ```
 
-Open **http://127.0.0.1:4747** · **New orbit** mints a session · optional **system preamble** · **Halt** or **Escape** cancels streaming · models **Rescan** after loading weights elsewhere.
+Open **http://127.0.0.1:4747** · **New orbit** mints a session · optional **system preamble** · **Halt** / **Escape** stops streaming · **Copy orbit** / **Download orbit** · assistant replies **render as Markdown** (fenced code, lists, links) after each stream completes via CDN **marked** + **DOMPurify** (offline = plain text). **Rescan** models after loading weights elsewhere.
 
 Quick sanity check without Cursor:
 
