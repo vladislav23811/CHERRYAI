@@ -67,6 +67,7 @@ nav:
       - Overview: releases/README.md
       - v1 snapshot: releases/v1/index.md
       - v2 scaffold: releases/v2/index.md
+  - Changelog: CHANGELOG.md
   - Examples:
       - Bootstrapping a feature: examples/01-bootstrapping-a-feature.md
       - Research and refactor: examples/02-research-and-refactor.md

@@ -12,6 +12,7 @@ Documentation for the **MZ AI** Cursor rule framework — autonomous genie-style
 - **[Production adoption](PRODUCTION-ADOPTION.md)** — Pilot → expand → team rhythm
 - **[Rule architecture](RULE-ARCHITECTURE.md)** — Naming, stacks, versioning
 - **[Versioning handbook](VERSIONING-HANDBOOK.md)** — page moves, redirects, and release docs strategy
+- **[Changelog](CHANGELOG.md)** — docs and framework milestones
 - **[Tutorials](TUTORIALS/README.md)** — First custom rule · multi-agent sessions
 
 ## Source

@@ -46,5 +46,5 @@
 
 ## Next queue
 
-- [ ] Add changelog page for docs/rule evolution milestones
-- [ ] Add a lightweight docs link-check CI step for changed Markdown
+- [x] Add changelog page for docs/rule evolution milestones
+- [x] Add a lightweight docs link-check CI step for changed Markdown

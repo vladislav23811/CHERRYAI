@@ -6,6 +6,8 @@ on:
     paths:
       - "docs/**"
       - "scripts/validate-template-registry.mjs"
+      - "scripts/check-docs-links-changed.mjs"
+      - ".markdown-link-check.json"
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - "package.json"
@@ -15,6 +17,8 @@ on:
     paths:
       - "docs/**"
       - "scripts/validate-template-registry.mjs"
+      - "scripts/check-docs-links-changed.mjs"
+      - ".markdown-link-check.json"
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - "package.json"
@@ -31,6 +35,28 @@ permissions:
   id-token: write
 
 jobs:
+  link-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base ref for diff
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check links in changed docs Markdown
+        env:
+          DOCS_LINK_BASE_REF: origin/${{ github.base_ref }}
+        run: npm run docs:check-links
+
   build:
     runs-on: ubuntu-latest
     steps:
