@@ -115,7 +115,14 @@ npm run start:ui
 # after npm link in this folder: kairo serve
 ```
 
-Open **http://127.0.0.1:4747** · click **New orbit** to mint a session, choose a model, write prompts.
+Open **http://127.0.0.1:4747** · **New orbit** mints a session · optional **system preamble** · **Halt** or **Escape** cancels streaming · models **Rescan** after loading weights elsewhere.
+
+Quick sanity check without Cursor:
+
+```bash
+node dist/cli.js doctor
+# or: kairo doctor
+```
 
 Environment:
 
@@ -130,6 +137,7 @@ The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` /
 ```text
 kairo mcp       # stdio MCP (default)
 kairo serve     # web halo + SSE
+kairo doctor    # env dump + health + model count
 kairo --help
 ```
 

@@ -125,13 +125,17 @@ export async function runServe(): Promise<void> {
           Connection: "keep-alive",
         });
 
+        const ac = new AbortController();
+        const onAbort = (): void => ac.abort();
+        req.on("close", onAbort);
+
         let full = "";
         try {
-          for await (const delta of backend.chatStream(model, chatMessages)) {
+          for await (const delta of backend.chatStream(model, chatMessages, ac.signal)) {
             full += delta;
             res.write(`data: ${JSON.stringify({ delta })}\n\n`);
           }
-          if (body.session_id) {
+          if (body.session_id && !ac.signal.aborted) {
             sessions.appendMessages(body.session_id, [
               { role: "user", content: message },
               { role: "assistant", content: full },
@@ -140,7 +144,10 @@ export async function runServe(): Promise<void> {
           res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
-          res.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
+          const aborted = ac.signal.aborted;
+          res.write(`data: ${JSON.stringify({ error: msg, cancelled: aborted })}\n\n`);
+        } finally {
+          req.off("close", onAbort);
         }
         res.end();
         return;

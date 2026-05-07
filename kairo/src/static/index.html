@@ -84,6 +84,28 @@
     footer { margin-top: 2rem; text-align: center; font-size: 0.72rem; color: var(--mist); }
     footer a { color: var(--gold); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
+    button.stop {
+      border-color: rgba(248, 113, 113, 0.55);
+      background: linear-gradient(135deg, rgba(248, 113, 113, 0.22), rgba(94, 234, 212, 0.08));
+    }
+    details.sysbox {
+      margin-bottom: 0.85rem;
+      color: var(--mist);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+    details.sysbox summary {
+      cursor: pointer;
+      user-select: none;
+      text-transform: uppercase;
+      list-style: none;
+    }
+    details.sysbox summary::-webkit-details-marker { display: none; }
+    details.sysbox textarea {
+      margin-top: 0.4rem;
+      min-height: 52px;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -103,8 +125,13 @@
         <button type="button" id="refreshModels" title="Reload model list from inference backend">Rescan models</button>
         <button type="button" id="newSession">New orbit</button>
         <button type="button" id="send" disabled>Transmit</button>
+        <button type="button" id="stopStream" class="stop" disabled title="Stop generation (Escape)">Halt</button>
         <div id="statusLine" class="status">Warming sensors…</div>
       </div>
+      <details class="sysbox">
+        <summary>System preamble · optional</summary>
+        <textarea id="system" placeholder="Steer tone, stack, or constraints for this chat…" spellcheck="false" aria-label="System preamble"></textarea>
+      </details>
       <div id="log" aria-live="polite"></div>
       <textarea id="input" placeholder="Ask Kairo to architect, debug, or sculpt code…" spellcheck="false"></textarea>
     </div>
@@ -119,6 +146,8 @@
     const modelSel = $("model");
     const statusLine = $("statusLine");
     let sessionId = null;
+    /** @type {AbortController | null} */
+    let streamAbort = null;
 
     function line(kind, text) {
       const div = document.createElement("div");
@@ -193,31 +222,59 @@
       logEl.appendChild(accEl);
       const buf = accEl.querySelector(".buf");
       let acc = "";
+      const ac = new AbortController();
+      streamAbort = ac;
+      $("stopStream").disabled = false;
       const payload = { message: text, session_id: sessionId || undefined, model: sessionId ? undefined : modelSel.value };
-      const res = await fetch("/api/chat/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      let carry = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        carry += dec.decode(value, { stream: true });
-        let idx;
-        while ((idx = carry.indexOf("\n\n")) >= 0) {
-          const chunk = carry.slice(0, idx).trim();
-          carry = carry.slice(idx + 2);
-          if (!chunk.startsWith("data:")) continue;
-          const json = chunk.slice(5).trim();
+      const sys = $("system").value.trim();
+      if (sys) payload.system = sys;
+      try {
+        const res = await fetch("/api/chat/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: ac.signal,
+        });
+        if (!res.ok) {
+          let detail = res.statusText || "error";
           try {
-            const ev = JSON.parse(json);
-            if (ev.delta) { acc += ev.delta; buf.textContent = acc; logEl.scrollTop = logEl.scrollHeight; }
-            if (ev.error) buf.textContent = "⚠ " + ev.error;
+            const t = await res.text();
+            const j = JSON.parse(t);
+            if (j.error) detail = j.error;
           } catch (_) {}
+          buf.textContent = "⚠ HTTP " + res.status + ": " + detail;
+          return;
         }
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        let carry = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          carry += dec.decode(value, { stream: true });
+          let idx;
+          while ((idx = carry.indexOf("\n\n")) >= 0) {
+            const chunk = carry.slice(0, idx).trim();
+            carry = carry.slice(idx + 2);
+            if (!chunk.startsWith("data:")) continue;
+            const json = chunk.slice(5).trim();
+            try {
+              const ev = JSON.parse(json);
+              if (ev.delta) {
+                acc += ev.delta;
+                buf.textContent = acc;
+                logEl.scrollTop = logEl.scrollHeight;
+              }
+              if (ev.error) buf.textContent = acc + (acc ? "\n\n" : "") + "⚠ " + ev.error;
+            } catch (_) {}
+          }
+        }
+      } catch (e) {
+        if (e.name === "AbortError") buf.textContent = acc ? acc + "\n\n… transmission halted" : "… transmission halted";
+        else buf.textContent = (acc ? acc + "\n\n" : "") + "⚠ " + e.message;
+      } finally {
+        streamAbort = null;
+        $("stopStream").disabled = true;
       }
     }
 
@@ -237,6 +294,11 @@
 
     $("input").addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("send").click(); }
+    });
+
+    $("stopStream").onclick = () => streamAbort && streamAbort.abort();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && streamAbort) streamAbort.abort();
     });
 
     $("refreshModels").onclick = () => refreshModels();
