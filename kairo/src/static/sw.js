@@ -4,7 +4,13 @@ const CACHE = "kairo-shell-__KAIRO_CACHE_VERSION__";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then(async (cache) => {
-      const urls = ["/", "/vendor/marked.min.js", "/vendor/purify.min.js"];
+      const urls = [
+        "/",
+        "/vendor/marked.min.js",
+        "/vendor/purify.min.js",
+        "/manifest.webmanifest",
+        "/favicon.svg",
+      ];
       await Promise.all(urls.map((u) => cache.add(u).catch(() => {})));
     }),
   );
@@ -30,7 +36,9 @@ self.addEventListener("fetch", (event) => {
   const shell =
     url.pathname === "/" ||
     url.pathname.startsWith("/vendor/") ||
-    url.pathname === "/sw.js";
+    url.pathname === "/sw.js" ||
+    url.pathname === "/manifest.webmanifest" ||
+    url.pathname === "/favicon.svg";
   if (!shell) return;
 
   event.respondWith(

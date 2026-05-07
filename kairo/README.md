@@ -134,7 +134,7 @@ Environment:
 
 The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` / `KAIRO_MODEL` env as MCP.
 
-Markdown rendering uses **vendored** `marked` + `dompurify` copied into `dist/static/vendor/` on `npm run build` — no CDN required. The server exposes **`GET /vendor/*`** (allowlisted), **`GET /api/meta`** (`kairo_version`, backend, endpoint), **`GET /health`** (process liveness + uptime, no inference round-trip), and **`GET /sw.js`** + a registered **service worker** so `/` and `/vendor/*` can load offline after the first visit (API/streaming still needs the server).
+Markdown rendering uses **vendored** `marked` + `dompurify` copied into `dist/static/vendor/` on `npm run build` — no CDN required. The server exposes **`GET /vendor/*`** (allowlisted), **`GET /api/meta`**, **`GET /health`**, **`GET /manifest.webmanifest`**, **`GET /favicon.svg`**, and **`GET /sw.js`**. A **service worker** caches the shell (`/`, `/vendor/*`, manifest, icon) for offline reloads (API/streaming still needs the server). The UI persists **model**, **system preamble**, and **session id** in **`localStorage`** (Forget orbit clears the stored session link).
 
 ## CLI commands
 

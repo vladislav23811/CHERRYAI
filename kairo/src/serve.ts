@@ -13,6 +13,12 @@ const VENDOR_FILES = new Map([
   ["purify.min.js", "application/javascript; charset=utf-8"],
 ]);
 
+/** Root-level static assets (basename → content-type). */
+const STATIC_FILES = new Map([
+  ["manifest.webmanifest", "application/manifest+json; charset=utf-8"],
+  ["favicon.svg", "image/svg+xml; charset=utf-8"],
+]);
+
 function cors(res: ServerResponse): void {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -75,6 +81,28 @@ export async function runServe(): Promise<void> {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ ...h, backend: backend.kind, endpoint: backend.label }));
         return;
+      }
+
+      if (req.method === "GET") {
+        const pathOnly = decodeURIComponent((url.split("?")[0] || "/").replace(/\/+$/, "") || "/");
+        const leaf = basename(pathOnly === "/" ? "" : pathOnly);
+        const ctype = STATIC_FILES.get(leaf);
+        if (ctype && pathOnly === `/${leaf}`) {
+          try {
+            const buf = readFileSync(join(__dirname, "static", leaf));
+            const headers: Record<string, string> = {
+              "Content-Type": ctype,
+              "Cache-Control":
+                leaf === "manifest.webmanifest" ? "no-cache" : "public, max-age=86400",
+            };
+            res.writeHead(200, headers);
+            res.end(buf);
+          } catch {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "asset missing — run npm run build" }));
+          }
+          return;
+        }
       }
 
       if (req.method === "GET" && url.split("?")[0] === "/sw.js") {

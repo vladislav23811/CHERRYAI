@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f1629" />
+  <meta name="description" content="Local inference cockpit — Cursor MCP halo" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <title>Kairo · local brilliance</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -167,6 +171,7 @@
         </div>
         <button type="button" id="refreshModels" title="Reload model list from inference backend">Rescan models</button>
         <button type="button" id="newSession">New orbit</button>
+        <button type="button" id="forgetOrbit" disabled title="Clear linked session from this browser">Forget orbit</button>
         <button type="button" id="send" disabled>Transmit</button>
         <button type="button" id="stopStream" class="stop" disabled title="Stop generation (Escape)">Halt</button>
         <button type="button" id="copyOrbit" title="Copy transcript as markdown">Copy orbit</button>
@@ -197,6 +202,46 @@
     let sessionId = null;
     /** @type {AbortController | null} */
     let streamAbort = null;
+
+    const LS = {
+      model: "kairo_ui_v1.model",
+      system: "kairo_ui_v1.system",
+      session: "kairo_ui_v1.session_id",
+    };
+    function loadLs(k) {
+      try {
+        return localStorage.getItem(k);
+      } catch (_) {
+        return null;
+      }
+    }
+    function saveLs(k, v) {
+      try {
+        if (v == null || v === "") localStorage.removeItem(k);
+        else localStorage.setItem(k, v);
+      } catch (_) {}
+    }
+    function uuidLooksOk(s) {
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(s || ""));
+    }
+    function syncForgetBtn() {
+      const b = $("forgetOrbit");
+      if (b) b.disabled = !sessionId;
+    }
+    function invalidateSessionIfNeeded(text) {
+      if (!sessionId || !text) return;
+      const low = String(text).toLowerCase();
+      if (low.includes("unknown session")) {
+        sessionId = null;
+        saveLs(LS.session, null);
+        syncForgetBtn();
+      }
+    }
+
+    const sysStored = loadLs(LS.system);
+    if (sysStored && $("system")) $("system").value = sysStored;
+    const sidStored = loadLs(LS.session);
+    if (sidStored && uuidLooksOk(sidStored)) sessionId = sidStored;
 
     function snapshotStatus() {
       return { text: statusLine.textContent, cls: statusLine.className };
@@ -307,7 +352,8 @@
           if (uptimeStr) parts.push("up " + uptimeStr);
           if (parts.length) fv.textContent = parts.join(" · ") + " ·";
         }
-        const prev = modelSel.value;
+        const storedModel = loadLs(LS.model);
+        const prev = modelSel.value || storedModel || "";
         modelSel.innerHTML = "";
         (j.models || []).forEach((m) => {
           const o = document.createElement("option");
@@ -316,6 +362,7 @@
           modelSel.appendChild(o);
         });
         if (prev && [...modelSel.options].some((o) => o.value === prev)) modelSel.value = prev;
+        if (modelSel.value) saveLs(LS.model, modelSel.value);
 
         const back = hh.backend || "inference";
         const ep = clipEp(hh.endpoint || "", 52);
@@ -336,6 +383,26 @@
       }
     }
 
+    modelSel.addEventListener("change", () => {
+      if (modelSel.value) saveLs(LS.model, modelSel.value);
+    });
+
+    let sysTimer = null;
+    $("system").addEventListener("input", () => {
+      clearTimeout(sysTimer);
+      sysTimer = setTimeout(() => saveLs(LS.system, $("system").value), 450);
+    });
+
+    $("forgetOrbit").onclick = () => {
+      sessionId = null;
+      saveLs(LS.session, null);
+      syncForgetBtn();
+      const prev = snapshotStatus();
+      statusLine.textContent = "Orbit unlinked from browser";
+      statusLine.className = "status ok";
+      setTimeout(() => applyStatus(prev), 1200);
+    };
+
     $("newSession").onclick = async () => {
       try {
         const body = modelSel.value ? { model: modelSel.value } : {};
@@ -343,6 +410,8 @@
         const j = await r.json();
         if (!r.ok) throw new Error(j.error || "session failed");
         sessionId = j.session_id;
+        saveLs(LS.session, sessionId);
+        syncForgetBtn();
         line("ai", "Session locked · id " + sessionId.slice(0, 8) + "… · model " + j.model);
       } catch (e) {
         line("ai", "Could not open session: " + e.message);
@@ -380,6 +449,7 @@
             const j = JSON.parse(t);
             if (j.error) detail = j.error;
           } catch (_) {}
+          invalidateSessionIfNeeded(detail);
           buf.textContent = "⚠ HTTP " + res.status + ": " + detail;
           return;
         }
@@ -405,6 +475,7 @@
                 logEl.scrollTop = logEl.scrollHeight;
               }
               if (ev.error) {
+                invalidateSessionIfNeeded(ev.error);
                 buf.textContent = acc + (acc ? "\n\n" : "") + "⚠ " + ev.error;
                 hadStreamError = true;
               }
@@ -500,6 +571,14 @@
       addEventListener("load", () => {
         navigator.serviceWorker.register("/sw.js").catch(() => {});
       });
+    }
+
+    syncForgetBtn();
+    if (sessionId) {
+      line(
+        "ai",
+        "Orbit re-linked from browser · server remembers prior turns · transcript starts fresh until you transmit.",
+      );
     }
 
     refreshModels();
