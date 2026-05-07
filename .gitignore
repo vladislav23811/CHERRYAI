@@ -26,6 +26,9 @@ coverage/
 tmp/
 temp/
 
+# Local clone used by scripts/sync-github-wiki.mjs
+.wiki-sync/
+
 # Node
 node_modules/
 

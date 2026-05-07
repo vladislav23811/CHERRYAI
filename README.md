@@ -135,6 +135,12 @@ mkdocs serve
 
 Publishing uses GitHub Actions (`.github/workflows/docs.yml`). In the GitHub repo, enable **Pages → GitHub Actions** once so pushes to `main` deploy to **`https://vladislav23811.github.io/CHERRYAI/`** (project Pages URL for this repository).
 
+## Wiki
+
+Quick orientation and sidebar navigation (sources in repo [`wiki/`](https://github.com/vladislav23811/CHERRYAI/tree/main/wiki)): **[GitHub Wiki](https://github.com/vladislav23811/CHERRYAI/wiki)**.
+
+Maintainers: enable **Wikis** under repo Settings if the wiki URL is empty; after editing `wiki/*.md`, run **`npm run wiki:sync`** with credentials that can push to `CHERRYAI.wiki.git` (see `CONTRIBUTING.md`).
+
 ## License
 
 Personal Use Only (non-commercial) - see `LICENSE`.

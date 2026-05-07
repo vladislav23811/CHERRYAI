@@ -39,3 +39,23 @@ Use imperative subject lines:
 ## Community
 
 Be respectful, direct, and constructive.
+
+## GitHub wiki
+
+Orientation pages are tracked in **`wiki/`** on `main` and mirrored to **[github.com/vladislav23811/CHERRYAI/wiki](https://github.com/vladislav23811/CHERRYAI/wiki)**.
+
+If `git clone https://github.com/vladislav23811/CHERRYAI.wiki.git` fails with “repository not found”, enable **Wikis** under **Settings → General → Features** for the repo (repo admins only), then create or sync the wiki.
+
+Publish updates after editing `wiki/*.md`:
+
+```bash
+npm run wiki:sync
+```
+
+Preview commands without cloning:
+
+```bash
+npm run wiki:sync -- --dry-run
+```
+
+Use a Git credential that can push to `*.wiki.git` (HTTPS + PAT or SSH). Override remote with **`WIKI_REMOTE`** if you use a fork. The script clones into **`.wiki-sync/`** (gitignored), copies markdown from **`wiki/`**, commits when there are changes, and pushes.

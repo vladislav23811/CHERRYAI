@@ -18,6 +18,7 @@
     "plugins:loop": "npm run plugins:audit && npm run plugins:roadmap",
     "templates:validate-registry": "node scripts/validate-template-registry.mjs",
     "docs:check-links": "node scripts/check-docs-links-changed.mjs",
+    "wiki:sync": "node scripts/sync-github-wiki.mjs",
     "validate:all": "npm run rules:validate && npm run rules:doctor",
     "validate:ci": "npm run validate:all"
   }
