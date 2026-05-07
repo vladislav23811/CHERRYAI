@@ -135,6 +135,10 @@ mkdocs serve
 
 Publishing uses GitHub Actions (`.github/workflows/docs.yml`). In the GitHub repo, enable **Pages → GitHub Actions** once so pushes to `main` deploy to **`https://vladislav23811.github.io/CHERRYAI/`** (project Pages URL for this repository).
 
+## Kairo (experimental)
+
+**[Kairo](kairo/README.md)** — local coding copilot MCP server: Cursor talks to **Ollama** via tools (`kairo_chat`, `kairo_models`, `kairo_health`). Build with `cd kairo && npm install && npm run build`, then point Cursor MCP at `kairo/dist/index.js`.
+
 ## Wiki
 
 Quick orientation and sidebar navigation (sources in repo [`wiki/`](https://github.com/vladislav23811/CHERRYAI/tree/main/wiki)): **[GitHub Wiki](https://github.com/vladislav23811/CHERRYAI/wiki)**.

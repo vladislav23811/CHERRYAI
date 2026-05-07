@@ -1,0 +1,26 @@
+{
+  "name": "kairo",
+  "version": "0.1.0",
+  "description": "Kairo — local coding copilot MCP server (Ollama) for Cursor",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "kairo-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start:mcp": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["mcp", "cursor", "ollama", "local-llm", "coding-agent"],
+  "author": "vladislav23811",
+  "license": "SEE LICENSE IN ../LICENSE",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  }
+}
