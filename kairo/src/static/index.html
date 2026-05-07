@@ -51,7 +51,7 @@
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
       padding: 1.25rem 1.35rem 1.5rem;
     }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1rem; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: flex-end; margin-bottom: 1rem; }
     label { color: var(--mist); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
     select, button {
       font-family: inherit; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--gold-dim);
@@ -100,6 +100,7 @@
           <label for="model">Model</label><br />
           <select id="model"></select>
         </div>
+        <button type="button" id="refreshModels" title="Reload model list from inference backend">Rescan models</button>
         <button type="button" id="newSession">New orbit</button>
         <button type="button" id="send" disabled>Transmit</button>
         <div id="statusLine" class="status">Warming sensors…</div>
@@ -109,7 +110,7 @@
     </div>
     <footer>
       Wire Cursor via MCP · <a href="https://github.com/vladislav23811/CHERRYAI/tree/main/kairo" target="_blank" rel="noopener">source</a>
-      · SSE stream → Ollama on your machine
+      · SSE → your local inference endpoint (Ollama or OpenAI-compatible)
     </footer>
   </div>
   <script>
@@ -130,10 +131,19 @@
       return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     }
 
+    function clipEp(s, max) {
+      if (!s || s.length <= max) return s || "";
+      return s.slice(0, Math.floor(max / 2) - 1) + "…" + s.slice(-Math.floor(max / 2) + 2);
+    }
+
     async function refreshModels() {
+      statusLine.textContent = "Scanning inference plane…";
+      statusLine.className = "status";
       try {
-        const r = await fetch("/api/models");
-        const j = await r.json();
+        const [mr, hr] = await Promise.all([fetch("/api/models"), fetch("/api/health")]);
+        const j = await mr.json();
+        const hh = await hr.json();
+        const prev = modelSel.value;
         modelSel.innerHTML = "";
         (j.models || []).forEach((m) => {
           const o = document.createElement("option");
@@ -141,14 +151,24 @@
           o.textContent = m;
           modelSel.appendChild(o);
         });
-        const h = await fetch("/api/health");
-        const hh = await h.json();
-        statusLine.textContent = hh.ok ? "Ollama linked · ready" : ("Offline · " + hh.detail);
-        statusLine.className = "status " + (hh.ok ? "ok" : "bad");
+        if (prev && [...modelSel.options].some((o) => o.value === prev)) modelSel.value = prev;
+
+        const back = hh.backend || "inference";
+        const ep = clipEp(hh.endpoint || "", 52);
+        if (hh.ok) {
+          statusLine.textContent = (j.models || []).length
+            ? `${back} · ${ep} · ${j.models.length} models`
+            : `${back} · ${ep} · no models listed`;
+          statusLine.className = "status ok";
+        } else {
+          statusLine.textContent = `${back} · offline · ${hh.detail || ""}`;
+          statusLine.className = "status bad";
+        }
         $("send").disabled = !hh.ok || !(j.models || []).length;
       } catch (e) {
         statusLine.textContent = "Cannot reach Kairo API";
         statusLine.className = "status bad";
+        $("send").disabled = true;
       }
     }
 
@@ -219,6 +239,7 @@
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("send").click(); }
     });
 
+    $("refreshModels").onclick = () => refreshModels();
     refreshModels();
   </script>
 </body>

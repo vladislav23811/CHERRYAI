@@ -21,7 +21,7 @@ export function createKairoMcpServer(): McpServer {
     "Prefer concise answers with fenced code; cite uncertainty.",
   ].join(" ");
 
-  const server = new McpServer({ name: "kairo", version: "0.3.0" }, { instructions });
+  const server = new McpServer({ name: "kairo", version: "0.3.1" }, { instructions });
 
   server.registerResource(
     "kairo_engineering_prompt",

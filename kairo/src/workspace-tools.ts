@@ -1,6 +1,7 @@
+import path from "node:path";
 import * as z from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { grepWorkspace, listDirectorySafe, readFileSafe } from "./workspace-fs.js";
+import { type DirEntry, grepWorkspace, listDirectorySafe, readFileSafe } from "./workspace-fs.js";
 import { collectWorkspaceRoots } from "./workspace-roots.js";
 import { resolveUnderRoots } from "./workspace-path.js";
 
@@ -50,9 +51,10 @@ export function registerWorkspaceTools(mcp: McpServer): void {
   mcp.registerTool(
     "kairo_list_directory",
     {
-      description: "List immediate children of a directory inside workspace roots (skips heavy dirs like node_modules).",
+      description:
+        "List immediate children of a directory inside workspace roots (skips heavy dirs like node_modules). Path '.' lists every root side-by-side.",
       inputSchema: {
-        path: z.string().describe("Directory path (relative or absolute within roots). Use '.' for root."),
+        path: z.string().describe("Directory path (relative or absolute within roots). Use '.' for all workspace roots."),
         max_entries: z.number().int().positive().max(500).optional(),
       },
     },
@@ -60,6 +62,28 @@ export function registerWorkspaceTools(mcp: McpServer): void {
       try {
         const roots = await collectWorkspaceRoots(mcp);
         const raw = rel.trim() === "" ? "." : rel;
+        const max = max_entries ?? 200;
+
+        if (raw === ".") {
+          const resolvedRoots = roots.map((r) => path.resolve(r));
+          const perRoot = Math.max(24, Math.ceil(max / Math.max(1, resolvedRoots.length)));
+          const listings = resolvedRoots.map((rootAbs) => {
+            try {
+              const entries = listDirectorySafe(rootAbs, perRoot);
+              return { root: rootAbs, directory: rootAbs, entries };
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : String(e);
+              return { root: rootAbs, directory: rootAbs, error: msg, entries: [] as DirEntry[] };
+            }
+          });
+          const text = JSON.stringify(
+            { scope: "all_workspace_roots", roots: resolvedRoots, listings },
+            null,
+            2,
+          );
+          return { content: [{ type: "text", text }] };
+        }
+
         const abs = resolveUnderRoots(roots, raw);
         if (!abs) {
           return {
@@ -67,7 +91,7 @@ export function registerWorkspaceTools(mcp: McpServer): void {
             isError: true,
           };
         }
-        const entries = listDirectorySafe(abs, max_entries ?? 200);
+        const entries = listDirectorySafe(abs, max);
         const text = JSON.stringify({ directory: abs, entries }, null, 2);
         return { content: [{ type: "text", text }] };
       } catch (e) {

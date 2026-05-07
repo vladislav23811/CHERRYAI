@@ -96,7 +96,7 @@ Leave `KAIRO_SESSION_DIR` empty for RAM-only sessions, or set a folder path to p
 | `kairo_session_delete` | Drop session |
 | `kairo_workspace_roots` | Effective filesystem roots |
 | `kairo_read_file` | Read UTF-8 file inside roots |
-| `kairo_list_directory` | List directory inside roots |
+| `kairo_list_directory` | List directory inside roots; path `.` returns **all** roots with entries each |
 | `kairo_grep` | Bounded regex search under roots |
 
 ### MCP resource
