@@ -184,7 +184,7 @@
     <footer>
       <span id="footerVersion" class="ver" aria-live="polite"></span>
       Wire Cursor via MCP · <a href="https://github.com/vladislav23811/CHERRYAI/tree/main/kairo" target="_blank" rel="noopener">source</a>
-      · SSE · Markdown offline via <code>/vendor/*</code>
+      · SSE · shell offline via service worker + <code>/vendor/*</code>
     </footer>
   </div>
   <script src="/vendor/marked.min.js"></script>
@@ -262,23 +262,50 @@
       return s.slice(0, Math.floor(max / 2) - 1) + "…" + s.slice(-Math.floor(max / 2) + 2);
     }
 
+    function fmtUptime(ms) {
+      const s = Math.floor(ms / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      if (d > 0) return d + "d " + h + "h";
+      if (h > 0) return h + "h " + m + "m";
+      if (m > 0) return m + "m";
+      return sec + "s";
+    }
+
     async function refreshModels() {
       statusLine.textContent = "Scanning inference plane…";
       statusLine.className = "status";
       try {
-        const [mr, hr, metaR] = await Promise.all([
+        const [mr, hr, metaR, probeR] = await Promise.all([
           fetch("/api/models"),
           fetch("/api/health"),
           fetch("/api/meta"),
+          fetch("/health"),
         ]);
         const j = await mr.json();
         const hh = await hr.json();
+        let uptimeStr = "";
+        if (probeR.ok) {
+          try {
+            const p = await probeR.json();
+            if (p.uptime_ms != null) uptimeStr = fmtUptime(p.uptime_ms);
+          } catch (_) {}
+        }
+        let verBit = "";
         if (metaR.ok) {
           try {
             const meta = await metaR.json();
-            const fv = $("footerVersion");
-            if (fv && meta.kairo_version) fv.textContent = "v" + meta.kairo_version + " ·";
+            if (meta.kairo_version) verBit = "v" + meta.kairo_version;
           } catch (_) {}
+        }
+        const fv = $("footerVersion");
+        if (fv) {
+          const parts = [];
+          if (verBit) parts.push(verBit);
+          if (uptimeStr) parts.push("up " + uptimeStr);
+          if (parts.length) fv.textContent = parts.join(" · ") + " ·";
         }
         const prev = modelSel.value;
         modelSel.innerHTML = "";
@@ -468,6 +495,12 @@
       statusLine.className = "status ok";
       setTimeout(() => applyStatus(prev), 900);
     };
+
+    if ("serviceWorker" in navigator) {
+      addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
 
     refreshModels();
   </script>

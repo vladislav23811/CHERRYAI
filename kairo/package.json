@@ -1,6 +1,6 @@
 {
   "name": "kairo",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Kairo — local coding copilot MCP server (Ollama / OpenAI-compatible) for Cursor",
   "type": "module",
   "main": "dist/index.js",

@@ -57,10 +57,38 @@ export async function runServe(): Promise<void> {
         return;
       }
 
+      if (req.method === "GET" && url === "/health") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            ok: true,
+            service: "kairo-ui",
+            kairo_version: readPackageVersion(),
+            uptime_ms: Math.round(process.uptime() * 1000),
+          }),
+        );
+        return;
+      }
+
       if (req.method === "GET" && url === "/api/health") {
         const h = await backend.health();
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ ...h, backend: backend.kind, endpoint: backend.label }));
+        return;
+      }
+
+      if (req.method === "GET" && url.split("?")[0] === "/sw.js") {
+        try {
+          const buf = readFileSync(join(__dirname, "static", "sw.js"), "utf8");
+          res.writeHead(200, {
+            "Content-Type": "application/javascript; charset=utf-8",
+            "Cache-Control": "no-cache",
+          });
+          res.end(buf);
+        } catch {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "sw.js missing — run npm run build" }));
+        }
         return;
       }
 

@@ -28,4 +28,14 @@ function cpVendor(relFromRoot, outName) {
 cpVendor(path.join("node_modules", "marked", "marked.min.js"), "marked.min.js");
 cpVendor(path.join("node_modules", "dompurify", "dist", "purify.min.js"), "purify.min.js");
 
-console.log("Copied src/static -> dist/static + vendor (marked, dompurify)");
+const pkgPath = path.join(root, "package.json");
+const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+const ver = String(pkg.version || "0");
+const swDest = path.join(dest, "sw.js");
+if (fs.existsSync(swDest)) {
+  let sw = fs.readFileSync(swDest, "utf8");
+  sw = sw.replace(/__KAIRO_CACHE_VERSION__/g, ver);
+  fs.writeFileSync(swDest, sw, "utf8");
+}
+
+console.log("Copied src/static -> dist/static + vendor (marked, dompurify) + sw cache version");
