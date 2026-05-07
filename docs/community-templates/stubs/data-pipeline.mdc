@@ -1,0 +1,27 @@
+---
+description: Template — Data pipeline / batch jobs for [YOUR PROJECT]. Copy to .cursor/rules/ and customize.
+alwaysApply: false
+---
+
+# Data pipeline overlay ([YOUR PROJECT])
+
+## Purpose
+
+Safe batch and streaming-ish work: reproducibility, retries, and data integrity.
+
+## Behavior
+
+- Make steps **idempotent** or explicitly document why not; guard double-processing.
+- Separate **schema evolution** from consumer rollout when touching serialized formats.
+- Surface **failure modes**: partial writes, poison messages, backlog pressure — propose metrics or logs.
+- For external stores: use **transactions / batches** appropriately; avoid unbounded memory collects on large inputs.
+- Document **backfills** and ordering assumptions when migrating data.
+
+## Out of scope
+
+- Warehouse-specific SQL dialects unless this repo owns them (split a warehouse-specific stub).
+
+## Validation
+
+- Run dry-run or subset jobs where possible.
+- Verify counts/samplers before full prod pushes.

@@ -1,0 +1,27 @@
+---
+description: Template — Security-conscious delivery for [YOUR TEAM/PRODUCT]. Copy to .cursor/rules/ and customize.
+alwaysApply: false
+---
+
+# Security SDLC overlay ([YOUR TEAM])
+
+## Purpose
+
+Raise the bar on changes that touch trust boundaries: credentials, permissions, user data, infra keys.
+
+## Behavior
+
+- **Secrets:** never commit or echo secrets; use env / vault patterns already in the repo.
+- **Least privilege:** default deny; justify new broad permissions or network exposure.
+- **Input:** treat untrusted input as hostile at system boundaries (including agent/tool outputs).
+- **Dependencies:** flag high-risk upgrades; prefer pinned versions where the stack allows.
+- **Incident posture:** if you introduce new sensitive flows, note what to monitor or audit.
+
+## Out of scope
+
+- Formal penetration testing — this rule shapes implementation hygiene only.
+
+## Validation
+
+- Run applicable static checks / `npm run validate:all` when this repo ships MZ AI scripts.
+- Otherwise use your org checklist; in the **MZ AI monorepo**, see `docs/RELIABILITY-SECURITY-HARDENING.md`.

@@ -1,0 +1,27 @@
+---
+description: Template — Web/API surface discipline for [YOUR PROJECT]. Copy to .cursor/rules/ and customize.
+alwaysApply: false
+---
+
+# Web / API surface overlay ([YOUR PROJECT])
+
+## Purpose
+
+Keep HTTP/API layers predictable: validation, status codes, authz boundaries, and observability.
+
+## Behavior
+
+- Validate inputs at the boundary; fail with **consistent** error shapes (no silent coercion).
+- Enforce **authentication vs authorization** explicitly; never infer trust from URL alone.
+- Prefer **idempotent** mutations where clients retry; document breaking behaviors.
+- Log **request correlation** ids where the stack supports them; avoid logging secrets or raw PII.
+- On edits: note OpenAPI / client contract impacts when applicable.
+
+## Out of scope
+
+- Business domain rules beyond transport/security hygiene (add a second overlay rule if needed).
+
+## Validation
+
+- Smoke the changed routes or handlers.
+- Confirm error paths return intended HTTP semantics.

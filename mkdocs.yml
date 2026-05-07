@@ -1,0 +1,72 @@
+# MZ AI documentation site (MkDocs Material).
+# Local: pip install -r requirements-docs.txt && mkdocs serve
+# Publish: GitHub Actions → GitHub Pages (see .github/workflows/docs.yml)
+
+site_name: MZ AI / CHERRYAI
+site_description: Cursor-native AGI execution framework documentation
+site_author: vladislav23811
+
+# GitHub Pages project site for repo CHERRYAI
+site_url: https://vladislav23811.github.io/CHERRYAI/
+
+repo_name: CHERRYAI
+repo_url: https://github.com/vladislav23811/CHERRYAI
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Session bootstrap: MZ-AI-BOOTSTRAP-PROMPT.md
+  - Architecture: RULE-ARCHITECTURE.md
+  - Production adoption: PRODUCTION-ADOPTION.md
+  - Reliability & security: RELIABILITY-SECURITY-HARDENING.md
+  - Custom models: CUSTOM-MODELS.md
+  - Plugin / tool matrix: PLUGIN-TOOL-MATRIX.md
+  - Tutorials:
+      - Overview: TUTORIALS/README.md
+      - First custom rule: TUTORIALS/how-to-create-your-first-custom-agi-rule.md
+      - Multi-agent sessions: TUTORIALS/how-to-run-autonomous-multi-agent-sessions.md
+  - Community templates:
+      - Overview: community-templates/README.md
+      - Gallery & registry: community-templates/GALLERY.md
+      - Submitting a template: community-templates/SUBMITTING.md
+      - Moderation playbook: community-templates/MODERATION.md
+      - Stub index: community-templates/stubs/README.md
+  - Versioning handbook: VERSIONING-HANDBOOK.md
+  - Releases:
+      - Overview: releases/README.md
+      - v1 snapshot: releases/v1/index.md
+      - v2 scaffold: releases/v2/index.md
+  - Examples:
+      - Bootstrapping a feature: examples/01-bootstrapping-a-feature.md
+      - Research and refactor: examples/02-research-and-refactor.md

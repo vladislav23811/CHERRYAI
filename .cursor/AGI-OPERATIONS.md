@@ -2,6 +2,10 @@
 
 Use this file as your prompt and workflow control panel inside Cursor.
 
+## 0) MZ AI session bootstrap (canonical paste)
+
+For a **short** roadmap-aligned opener (Quick Start + plugins loop + session block): **`docs/MZ-AI-BOOTSTRAP-PROMPT.md`**.
+
 ## 1) Autonomous Build Prompt (Copy/Paste)
 
 ```text

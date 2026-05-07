@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "web-api-surface",
+      "title": "Web / API surface overlay",
+      "path": "stubs/web-api-surface.mdc",
+      "summary": "HTTP/API validation, authz boundaries, observability hygiene."
+    },
+    {
+      "id": "data-pipeline",
+      "title": "Data pipeline overlay",
+      "path": "stubs/data-pipeline.mdc",
+      "summary": "Batch/idempotent jobs, schema evolution, backfills."
+    },
+    {
+      "id": "security-sdlc",
+      "title": "Security SDLC overlay",
+      "path": "stubs/security-sdlc.mdc",
+      "summary": "Secrets, least privilege, dependency and audit posture."
+    }
+  ]
+}

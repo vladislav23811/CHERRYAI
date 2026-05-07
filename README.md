@@ -42,12 +42,21 @@ MZ AI turns Cursor into a high-velocity AGI build environment through production
    - `agi-execution-engine.mdc`
 5. Use prompts from `.cursor/AGI-OPERATIONS.md`.
 6. For parallel AUTO workflows see `.cursor/MULTI-AGENT-ORCHESTRATION.md` and `docs/PLUGIN-TOOL-MATRIX.md`.
+7. For reliability/security expectations before shipping changes, see `docs/RELIABILITY-SECURITY-HARDENING.md`.
+8. Rule architecture and walkthroughs: `docs/RULE-ARCHITECTURE.md`, `docs/TUTORIALS/`.
+9. Using another model or endpoint with Cursor: `docs/CUSTOM-MODELS.md`.
+10. Session bootstrap prompt + roadmap rhythm: `docs/MZ-AI-BOOTSTRAP-PROMPT.md`.
+11. Domain rule stubs for forks: `docs/community-templates/`.
+12. Rolling MZ AI out on a team: `docs/PRODUCTION-ADOPTION.md`.
+13. Docs evolution policy for page moves/releases: `docs/VERSIONING-HANDBOOK.md`.
+14. Release snapshots: `docs/releases/`.
 
 ## Local Automation
 
 Run local MZ AI toolkit commands:
 
 ```bash
+npm run validate:all           # rules:validate + rules:doctor (use before PRs)
 npm run rules:validate
 npm run rules:stacks
 npm run rules:doctor
@@ -114,6 +123,17 @@ Contributions are welcome. Start with:
 ## Roadmap
 
 See `ROADMAP.md` for upcoming milestones.
+
+## Documentation site
+
+Markdown sources live under `docs/`. A **[MkDocs Material](https://squidfunk.github.io/mkdocs-material/)** site builds into `site/` (ignored by git):
+
+```bash
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+Publishing uses GitHub Actions (`.github/workflows/docs.yml`). In the GitHub repo, enable **Pages → GitHub Actions** once so pushes to `main` deploy to **`https://vladislav23811.github.io/CHERRYAI/`** (project Pages URL for this repository).
 
 ## License
 

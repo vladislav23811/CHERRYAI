@@ -1,12 +1,17 @@
-name: Rules Validation
+name: Validate
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate-rules:
+  validate-all:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,8 +22,5 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate .mdc rules
-        run: npm run rules:validate
-
-      - name: Run rules doctor
-        run: npm run rules:doctor
+      - name: Quality gates (rules validate + doctor)
+        run: npm run validate:all
