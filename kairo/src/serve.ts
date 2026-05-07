@@ -1,11 +1,17 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createInferenceBackend, resolveModelTag } from "./inference/index.js";
 import { SessionStore } from "./sessions.js";
+import { readPackageVersion } from "./version-info.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const VENDOR_FILES = new Map([
+  ["marked.min.js", "application/javascript; charset=utf-8"],
+  ["purify.min.js", "application/javascript; charset=utf-8"],
+]);
 
 function cors(res: ServerResponse): void {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -55,6 +61,40 @@ export async function runServe(): Promise<void> {
         const h = await backend.health();
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ ...h, backend: backend.kind, endpoint: backend.label }));
+        return;
+      }
+
+      if (req.method === "GET" && url === "/api/meta") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            kairo_version: readPackageVersion(),
+            backend: backend.kind,
+            endpoint: backend.label,
+          }),
+        );
+        return;
+      }
+
+      if (req.method === "GET" && url.startsWith("/vendor/")) {
+        const name = basename(decodeURIComponent(url.replace(/^\/vendor\//, "").split("?")[0] || ""));
+        const ctype = VENDOR_FILES.get(name);
+        if (!ctype) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "not found" }));
+          return;
+        }
+        try {
+          const buf = readFileSync(join(__dirname, "static", "vendor", name));
+          res.writeHead(200, {
+            "Content-Type": ctype,
+            "Cache-Control": "public, max-age=86400",
+          });
+          res.end(buf);
+        } catch {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "vendor asset missing — run npm run build" }));
+        }
         return;
       }
 

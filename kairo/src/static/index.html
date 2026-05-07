@@ -124,6 +124,7 @@
     }
     textarea:focus { outline: none; border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(212, 168, 83, 0.15); }
     footer { margin-top: 2rem; text-align: center; font-size: 0.72rem; color: var(--mist); }
+    footer .ver { color: var(--gold-dim); letter-spacing: 0.14em; margin-right: 0.35rem; }
     footer a { color: var(--gold); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
     button.stop {
@@ -181,12 +182,13 @@
       <textarea id="input" placeholder="Ask Kairo to architect, debug, or sculpt code…" spellcheck="false"></textarea>
     </div>
     <footer>
+      <span id="footerVersion" class="ver" aria-live="polite"></span>
       Wire Cursor via MCP · <a href="https://github.com/vladislav23811/CHERRYAI/tree/main/kairo" target="_blank" rel="noopener">source</a>
-      · SSE → local inference · replies render as Markdown when CDN libs load
+      · SSE · Markdown offline via <code>/vendor/*</code>
     </footer>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" crossorigin="anonymous"></script>
+  <script src="/vendor/marked.min.js"></script>
+  <script src="/vendor/purify.min.js"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     const logEl = $("log");
@@ -264,9 +266,20 @@
       statusLine.textContent = "Scanning inference plane…";
       statusLine.className = "status";
       try {
-        const [mr, hr] = await Promise.all([fetch("/api/models"), fetch("/api/health")]);
+        const [mr, hr, metaR] = await Promise.all([
+          fetch("/api/models"),
+          fetch("/api/health"),
+          fetch("/api/meta"),
+        ]);
         const j = await mr.json();
         const hh = await hr.json();
+        if (metaR.ok) {
+          try {
+            const meta = await metaR.json();
+            const fv = $("footerVersion");
+            if (fv && meta.kairo_version) fv.textContent = "v" + meta.kairo_version + " ·";
+          } catch (_) {}
+        }
         const prev = modelSel.value;
         modelSel.innerHTML = "";
         (j.models || []).forEach((m) => {

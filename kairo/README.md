@@ -134,6 +134,8 @@ Environment:
 
 The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` / `KAIRO_MODEL` env as MCP.
 
+Markdown rendering uses **vendored** `marked` + `dompurify` copied into `dist/static/vendor/` on `npm run build` — no CDN required. The server exposes **`GET /vendor/*`** (allowlisted) and **`GET /api/meta`** (`kairo_version`, backend, endpoint).
+
 ## CLI commands
 
 ```text
