@@ -137,7 +137,7 @@ Publishing uses GitHub Actions (`.github/workflows/docs.yml`). In the GitHub rep
 
 ## Kairo (experimental)
 
-**[Kairo](kairo/README.md)** — local coding copilot: **MCP** tools + multi-turn **sessions**, **Ollama or OpenAI-compatible inference**, **workspace-scoped** read/list/grep tools, **`kairo://prompt/engineering`** resource, and a **streaming web UI** (`npm run start:ui` in `kairo/` → http://127.0.0.1:4747). Build: `cd kairo && npm install && npm run build`; Cursor MCP → `kairo/dist/index.js`.
+**[Kairo](kairo/README.md)** (v0.4.1) — local coding copilot: **MCP** tools + multi-turn **sessions**, **Ollama or OpenAI-compatible inference**, **workspace-scoped** read/list/grep tools, **`kairo://prompt/engineering`** resource, optional **orbit vault** (`KAIRO_VAULT_DIR`), and a **streaming web UI** (`npm run start:ui` in `kairo/` → http://127.0.0.1:4747). Build: `cd kairo && npm install && npm run build`; Cursor MCP → `kairo/dist/index.js`. CI from repo root: **`npm run kairo:ci`** (smoke backend + bundle gate; see `kairo/v0.4.1-spec.md`).
 
 ## Wiki
 

@@ -1,0 +1,41 @@
+name: Kairo
+
+on:
+  push:
+    branches:
+      - main
+      - "cursor/**"
+    paths:
+      - "kairo/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/kairo.yml"
+  pull_request:
+    paths:
+      - "kairo/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/kairo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kairo-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kairo-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: kairo/package-lock.json
+      - name: Kairo CI (build + validate)
+        run: npm run kairo:ci
+        env:
+          KAIRO_SMOKE_REPLY: probe-reply-alpha

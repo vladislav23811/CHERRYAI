@@ -176,6 +176,7 @@
         <button type="button" id="stopStream" class="stop" disabled title="Stop generation (Escape)">Halt</button>
         <button type="button" id="copyOrbit" title="Copy transcript as markdown">Copy orbit</button>
         <button type="button" id="downloadOrbit" title="Save transcript as .md file">Download orbit</button>
+        <button type="button" id="archiveVault" title="Persist transcript to server orbit vault">Archive to vault</button>
         <button type="button" id="clearLog" title="Clear transcript (session unchanged)">Clear log</button>
         <div id="statusLine" class="status">Warming sensors…</div>
       </div>
@@ -200,6 +201,7 @@
     const modelSel = $("model");
     const statusLine = $("statusLine");
     let sessionId = null;
+    let vaultEnabled = false;
     /** @type {AbortController | null} */
     let streamAbort = null;
 
@@ -343,8 +345,11 @@
           try {
             const meta = await metaR.json();
             if (meta.kairo_version) verBit = "v" + meta.kairo_version;
+            vaultEnabled = Boolean(meta.vault_enabled);
           } catch (_) {}
         }
+        const arch = $("archiveVault");
+        if (arch) arch.disabled = !vaultEnabled;
         const fv = $("footerVersion");
         if (fv) {
           const parts = [];
@@ -535,6 +540,42 @@
         setTimeout(() => applyStatus(prev), 1400);
       } catch (_) {
         line("ai", "Clipboard blocked — select transcript manually.");
+      }
+    };
+
+    $("archiveVault").onclick = async () => {
+      const md = transcriptMarkdown();
+      if (!md) {
+        statusLine.textContent = "Nothing to archive yet";
+        statusLine.className = "status";
+        setTimeout(() => refreshModels(), 1400);
+        return;
+      }
+      if (!vaultEnabled) {
+        statusLine.textContent = "Vault disabled on server";
+        statusLine.className = "status bad";
+        setTimeout(() => refreshModels(), 1600);
+        return;
+      }
+      try {
+        const r = await fetch("/api/vault/orbits", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId || undefined,
+            model: modelSel.value || undefined,
+            markdown: md,
+            title: "orbit-" + new Date().toISOString().slice(0, 10),
+          }),
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || "archive failed");
+        const prev = snapshotStatus();
+        statusLine.textContent = "Archived · vault id " + String(j.id || "").slice(0, 8) + "…";
+        statusLine.className = "status ok";
+        setTimeout(() => applyStatus(prev), 2200);
+      } catch (e) {
+        line("ai", "Vault archive failed: " + e.message);
       }
     };
 

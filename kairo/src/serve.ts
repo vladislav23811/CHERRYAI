@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { createInferenceBackend, resolveModelTag } from "./inference/index.js";
 import { SessionStore } from "./sessions.js";
 import { readPackageVersion } from "./version-info.js";
+import { OrbitVault } from "./orbit-vault.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -37,6 +38,8 @@ export async function runServe(): Promise<void> {
   const backend = createInferenceBackend();
   const port = Number(process.env.KAIRO_UI_PORT ?? "4747") || 4747;
   const sessions = new SessionStore(process.env.KAIRO_SESSION_DIR?.trim() || null);
+  const vaultDir = process.env.KAIRO_VAULT_DIR?.trim() || null;
+  const vault = vaultDir ? new OrbitVault(vaultDir) : null;
 
   let indexHtml: string;
   try {
@@ -57,6 +60,8 @@ export async function runServe(): Promise<void> {
     }
 
     try {
+      const pathOnly = decodeURIComponent((url.split("?")[0] || "/").replace(/\/+$/, "") || "/");
+
       if (req.method === "GET" && (url === "/" || url.startsWith("/?"))) {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
         res.end(indexHtml);
@@ -71,6 +76,7 @@ export async function runServe(): Promise<void> {
             service: "kairo-ui",
             kairo_version: readPackageVersion(),
             uptime_ms: Math.round(process.uptime() * 1000),
+            vault_enabled: Boolean(vault),
           }),
         );
         return;
@@ -84,7 +90,6 @@ export async function runServe(): Promise<void> {
       }
 
       if (req.method === "GET") {
-        const pathOnly = decodeURIComponent((url.split("?")[0] || "/").replace(/\/+$/, "") || "/");
         const leaf = basename(pathOnly === "/" ? "" : pathOnly);
         const ctype = STATIC_FILES.get(leaf);
         if (ctype && pathOnly === `/${leaf}`) {
@@ -127,8 +132,85 @@ export async function runServe(): Promise<void> {
             kairo_version: readPackageVersion(),
             backend: backend.kind,
             endpoint: backend.label,
+            vault_enabled: Boolean(vault),
           }),
         );
+        return;
+      }
+
+      if (req.method === "GET" && pathOnly === "/api/vault/orbits") {
+        if (!vault) {
+          res.writeHead(503, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "vault disabled", vault_enabled: false }));
+          return;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ vault_enabled: true, orbits: vault.list() }));
+        return;
+      }
+
+      if (req.method === "GET" && pathOnly.startsWith("/api/vault/orbits/")) {
+        if (!vault) {
+          res.writeHead(503, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "vault disabled", vault_enabled: false }));
+          return;
+        }
+        const id = pathOnly.slice("/api/vault/orbits/".length);
+        const rec = vault.get(id);
+        if (!rec) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "not found" }));
+          return;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(rec));
+        return;
+      }
+
+      if (req.method === "POST" && pathOnly === "/api/vault/orbits") {
+        if (!vault) {
+          res.writeHead(503, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "vault disabled", vault_enabled: false }));
+          return;
+        }
+        const body = (await readJsonBody(req)) as {
+          session_id?: string;
+          model?: string;
+          title?: string;
+          markdown?: string;
+        };
+        try {
+          const rec = vault.save({
+            session_id: body.session_id,
+            model: body.model,
+            title: body.title,
+            markdown: body.markdown ?? "",
+          });
+          res.writeHead(201, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(rec));
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: msg }));
+          return;
+        }
+        return;
+      }
+
+      if (req.method === "DELETE" && pathOnly.startsWith("/api/vault/orbits/")) {
+        if (!vault) {
+          res.writeHead(503, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "vault disabled", vault_enabled: false }));
+          return;
+        }
+        const id = pathOnly.slice("/api/vault/orbits/".length);
+        if (!vault.delete(id)) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "not found" }));
+          return;
+        }
+        res.writeHead(204);
+        res.end();
         return;
       }
 

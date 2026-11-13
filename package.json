@@ -20,6 +20,7 @@
     "docs:check-links": "node scripts/check-docs-links-changed.mjs",
     "wiki:sync": "node scripts/sync-github-wiki.mjs",
     "validate:all": "npm run rules:validate && npm run rules:doctor",
-    "validate:ci": "npm run validate:all"
+    "validate:ci": "npm run validate:all",
+    "kairo:ci": "npm --prefix kairo ci && npm --prefix kairo run kairo:ci"
   }
 }

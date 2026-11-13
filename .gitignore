@@ -32,5 +32,11 @@ temp/
 # Node
 node_modules/
 
+# Kairo local / CI artifacts
+kairo-bundle/
+kairo-bundle.tar.gz
+.kairo/
+.kairo-validate/
+
 # Generated plugin reports
 plugins/**/reports/*.json

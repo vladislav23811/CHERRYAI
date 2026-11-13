@@ -1,5 +1,6 @@
 import { OllamaInferenceBackend } from "./ollama-backend.js";
 import { OpenAICompatInferenceBackend } from "./openai-compat-backend.js";
+import { SmokeInferenceBackend } from "./smoke-backend.js";
 import type { InferenceBackend } from "./types.js";
 
 export type { ChatMsg, ChatRole, InferenceBackend } from "./types.js";
@@ -7,6 +8,9 @@ export { resolveModelTag } from "./types.js";
 
 export function createInferenceBackend(): InferenceBackend {
   const mode = (process.env.KAIRO_BACKEND ?? "ollama").trim().toLowerCase();
+  if (mode === "smoke") {
+    return new SmokeInferenceBackend();
+  }
   if (mode === "openai" || mode === "openai-compat" || mode === "lmstudio") {
     return new OpenAICompatInferenceBackend();
   }

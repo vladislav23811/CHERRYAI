@@ -3,7 +3,7 @@ export type ChatRole = "system" | "user" | "assistant";
 export type ChatMsg = { role: ChatRole; content: string };
 
 export interface InferenceBackend {
-  readonly kind: "ollama" | "openai-compat";
+  readonly kind: "ollama" | "openai-compat" | "smoke";
   readonly label: string;
   health(): Promise<{ ok: boolean; detail: string }>;
   listModels(): Promise<string[]>;

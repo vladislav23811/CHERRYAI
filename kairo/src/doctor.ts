@@ -9,6 +9,8 @@ type EnvSnapshot = {
   KAIRO_SESSION_DIR: string | null;
   KAIRO_WORKSPACE: string | null;
   KAIRO_UI_PORT: string | null;
+  KAIRO_VAULT_DIR: string | null;
+  KAIRO_SMOKE_REPLY: string | null;
 };
 
 function envSnapshot(): EnvSnapshot {
@@ -21,6 +23,8 @@ function envSnapshot(): EnvSnapshot {
     KAIRO_SESSION_DIR: process.env.KAIRO_SESSION_DIR ?? null,
     KAIRO_WORKSPACE: process.env.KAIRO_WORKSPACE ?? null,
     KAIRO_UI_PORT: process.env.KAIRO_UI_PORT ?? null,
+    KAIRO_VAULT_DIR: process.env.KAIRO_VAULT_DIR ?? null,
+    KAIRO_SMOKE_REPLY: process.env.KAIRO_SMOKE_REPLY ?? process.env.SMOKE_REPLY ?? null,
   };
 }
 
@@ -35,6 +39,8 @@ function envDisplay(): Record<string, string> {
     KAIRO_SESSION_DIR: snap.KAIRO_SESSION_DIR ?? "(unset)",
     KAIRO_WORKSPACE: snap.KAIRO_WORKSPACE ?? "(unset)",
     KAIRO_UI_PORT: snap.KAIRO_UI_PORT ?? "4747",
+    KAIRO_VAULT_DIR: snap.KAIRO_VAULT_DIR ?? "(unset)",
+    KAIRO_SMOKE_REPLY: snap.KAIRO_SMOKE_REPLY ?? "(default probe-reply-alpha)",
   };
 }
 

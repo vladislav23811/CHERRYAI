@@ -34,13 +34,15 @@ async function main(): Promise<void> {
   kairo --help
 
 Environment:
-  KAIRO_BACKEND      ollama | openai-compat | lmstudio (default ollama)
+  KAIRO_BACKEND      ollama | openai-compat | lmstudio | smoke (default ollama)
   KAIRO_OLLAMA_URL   Ollama base (default http://127.0.0.1:11434)
   KAIRO_OPENAI_BASE_URL   OpenAI-compatible /v1 base
   KAIRO_OPENAI_API_KEY    Optional Bearer token
   KAIRO_MODEL        Default model id/tag
   KAIRO_SESSION_DIR  Persist MCP/UI sessions as JSON
   KAIRO_UI_PORT      UI port (default 4747)
+  KAIRO_VAULT_DIR    Persist archived orbit transcripts (*.orbit.json)
+  KAIRO_SMOKE_REPLY  Fixed reply for smoke backend (CI: probe-reply-alpha)
 `);
     return;
   }

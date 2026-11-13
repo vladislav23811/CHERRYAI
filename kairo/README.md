@@ -115,7 +115,7 @@ npm run start:ui
 # after npm link in this folder: kairo serve
 ```
 
-Open **http://127.0.0.1:4747** · **New orbit** mints a session · optional **system preamble** · **Halt** / **Escape** stops streaming · **Copy orbit** / **Download orbit** · assistant replies **render as Markdown** (fenced code, lists, links) after each stream completes via CDN **marked** + **DOMPurify** (offline = plain text). **Rescan** models after loading weights elsewhere.
+Open **http://127.0.0.1:4747** · **New orbit** mints a session · optional **system preamble** · **Halt** / **Escape** stops streaming · **Copy orbit** / **Download orbit** · **Archive to vault** (when `KAIRO_VAULT_DIR` is set) · assistant replies **render as Markdown** (fenced code, lists, links) after each stream completes via vendored **marked** + **DOMPurify**. **Rescan** models after loading weights elsewhere.
 
 Quick sanity check without Cursor:
 
@@ -131,8 +131,12 @@ Environment:
 | Variable | Default | Meaning |
 | -------- | ------- | ------- |
 | `KAIRO_UI_PORT` | `4747` | HTTP port |
+| `KAIRO_VAULT_DIR` | _(unset)_ | Server-side orbit archive dir (`*.orbit.json`) |
+| `KAIRO_SMOKE_REPLY` | `probe-reply-alpha` | Fixed reply when `KAIRO_BACKEND=smoke` (CI) |
 
-The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` / `KAIRO_MODEL` env as MCP.
+The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` / `KAIRO_MODEL` env as MCP. Set `KAIRO_BACKEND=smoke` for deterministic probes without a local LLM.
+
+**CI:** from repo root, `npm run kairo:ci` (build + `scripts/kairo-validate.mjs`). See `v0.4.1-spec.md`.
 
 Markdown rendering uses **vendored** `marked` + `dompurify` copied into `dist/static/vendor/` on `npm run build` — no CDN required. The server exposes **`GET /vendor/*`** (allowlisted), **`GET /api/meta`**, **`GET /health`**, **`GET /manifest.webmanifest`**, **`GET /favicon.svg`**, and **`GET /sw.js`**. A **service worker** caches the shell (`/`, `/vendor/*`, manifest, icon) for offline reloads (API/streaming still needs the server). The UI persists **model**, **system preamble**, and **session id** in **`localStorage`** (Forget orbit clears the stored session link).
 
@@ -151,7 +155,8 @@ kairo --help
 
 | Variable | Default | Meaning |
 | -------- | ------- | ------- |
-| `KAIRO_BACKEND` | `ollama` | `ollama` · `openai` · `openai-compat` · `lmstudio` |
+| `KAIRO_BACKEND` | `ollama` | `ollama` · `openai` · `openai-compat` · `lmstudio` · `smoke` |
+| `KAIRO_SMOKE_REPLY` | `probe-reply-alpha` | Fixed reply when `KAIRO_BACKEND=smoke` (CI) |
 | `KAIRO_OLLAMA_URL` | `http://127.0.0.1:11434` | Ollama base (when backend is Ollama) |
 | `KAIRO_OPENAI_BASE_URL` | `http://127.0.0.1:1234/v1` | OpenAI-compat base; `/v1` appended if missing |
 | `KAIRO_OPENAI_API_KEY` | _(empty)_ | Optional `Authorization: Bearer …` |

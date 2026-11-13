@@ -23,6 +23,7 @@ Thanks for contributing.
 - [ ] Relevant tests added or updated
 - [ ] Lint/type checks pass for touched files
 - [ ] `npm run validate:all` passes locally (mirrors CI **Validate** workflow)
+- [ ] Kairo changes: `npm run kairo:ci` passes locally (mirrors CI **Kairo** workflow; on GitHub you can also use **Actions → Kairo → Run workflow**)
 - [ ] Docs changes: `pip install -r requirements-docs.txt && mkdocs build --strict` (mirrors CI **Docs** workflow)
 - [ ] Review `docs/RELIABILITY-SECURITY-HARDENING.md` for security/reliability touchpoints
 - [ ] Security/performance implications considered
@@ -59,3 +60,13 @@ npm run wiki:sync -- --dry-run
 ```
 
 Use a Git credential that can push to `*.wiki.git` (HTTPS + PAT or SSH). Override remote with **`WIKI_REMOTE`** if you use a fork. The script clones into **`.wiki-sync/`** (gitignored), copies markdown from **`wiki/`**, commits when there are changes, and pushes.
+
+## Cursor Cloud Agent pushes
+
+Cloud Agents that commit to this repo (for example the hourly **Continue development** automation on `cursor/ongoing-development-work-6657`) need push credentials in the agent environment.
+
+1. Open your [Cloud Agent environment](https://cursor.com/dashboard/cloud-agents/environments) and add a secret **`GITHUB_TOKEN`** or **`GH_TOKEN`**.
+2. Use a GitHub personal access token with **`repo`** and **`workflows`** scopes (fine-grained: Contents read/write + Actions read/write on this repository).
+3. Re-run the agent; `git push` over HTTPS should succeed without interactive login.
+
+Pushes to `cursor/**` branches run the **Kairo** workflow when `kairo/**` (or related paths) change, same as `main`.

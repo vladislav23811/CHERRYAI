@@ -48,3 +48,21 @@
 
 - [x] Add changelog page for docs/rule evolution milestones
 - [x] Add a lightweight docs link-check CI step for changed Markdown
+
+## Kairo (experimental local copilot)
+
+See `kairo/README.md` and `kairo/v0.4.1-spec.md`. CI from repo root: `npm run kairo:ci`.
+
+### v0.4.1 — smoke backend, orbit vault, CI validate
+
+- [x] Smoke inference backend (`KAIRO_BACKEND=smoke`, `KAIRO_SMOKE_REPLY` / `SMOKE_REPLY`)
+- [x] Orbit vault (`KAIRO_VAULT_DIR`, `/api/vault/orbits`, `*.orbit.json` records)
+- [x] UI **Archive to vault** when vault is enabled
+- [x] `kairo-validate.mjs` bundle gate + HTTP probes (ports 14746 / 14747)
+- [x] GitHub Actions workflow `.github/workflows/kairo.yml` (`cursor/**`, `main`, `workflow_dispatch`)
+
+### Kairo next
+
+- [ ] Push `cursor/ongoing-development-work-6657` and open PR → `main` (needs `GITHUB_TOKEN` / `GH_TOKEN` on Cloud Agent environment)
+- [ ] Tauri desktop shell (deferred)
+- [ ] v1.0.0 bundle signing (`KAIRO_SIGN_PRIVATE_KEY`)
