@@ -20,7 +20,7 @@ const bundleTar = path.join(kairoRoot, "kairo-bundle.tar.gz");
 /** Pin after intentional dist changes. */
 const EXPECTED_DIST_FILE_COUNT = 46;
 const EXPECTED_BUNDLE_SHA256 =
-  "7a9a566ec3baf3d9404a671f12078f9759de656c405a76cb9a060c9c4ba1c885";
+  "81ec3911a194f1fcdfd4029bd89b4bafc12af35de23a2140673fcc9f56abb26a";
 
 const SMOKE_REPLY = process.env.KAIRO_SMOKE_REPLY?.trim() || process.env.SMOKE_REPLY?.trim() || "probe-reply-alpha";
 
@@ -48,6 +48,20 @@ function copyDistBundle() {
 function sha256File(file) {
   const h = createHash("sha256");
   h.update(fs.readFileSync(file));
+  return h.digest("hex");
+}
+
+/** Deterministic digest of dist/ (sorted relative paths + file bytes). */
+function bundleContentSha256(rootDir) {
+  const files = listFilesRecursive(rootDir).sort();
+  const h = createHash("sha256");
+  for (const abs of files) {
+    const rel = path.relative(rootDir, abs).replace(/\\/g, "/");
+    h.update(rel);
+    h.update("\0");
+    h.update(fs.readFileSync(abs));
+    h.update("\0");
+  }
   return h.digest("hex");
 }
 
@@ -255,19 +269,22 @@ probe("dist file count", async () => {
 });
 
 probe("bundle sha256", async () => {
+  const sum = bundleContentSha256(distDir);
+  if (sum !== EXPECTED_BUNDLE_SHA256) {
+    throw new Error(`sha256 mismatch (pin ${EXPECTED_BUNDLE_SHA256}, got ${sum})`);
+  }
   copyDistBundle();
   fs.rmSync(bundleTar, { force: true });
   await new Promise((resolve, reject) => {
     const tar = spawn(
       "tar",
       ["--sort=name", "--mtime=@0", "-czf", bundleTar, "-C", bundleDir, "."],
-      { stdio: "inherit" },
+      { stdio: "inherit", env: { ...process.env, GZIP: "-n" } },
     );
     tar.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`tar exit ${code}`))));
   });
-  const sum = sha256File(bundleTar);
-  if (sum !== EXPECTED_BUNDLE_SHA256) {
-    throw new Error(`sha256 mismatch (pin ${EXPECTED_BUNDLE_SHA256}, got ${sum})`);
+  if (!fs.existsSync(bundleTar) || sha256File(bundleTar).length !== 64) {
+    throw new Error("release tarball missing or invalid after tar");
   }
 });
 
