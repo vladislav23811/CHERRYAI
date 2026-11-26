@@ -10,6 +10,7 @@ const pkgPath = path.join(root, "package.json");
 
 const required = [
   "automation/open-kairo-pr.mjs",
+  "automation/github-token.mjs",
   "automation/kairo-pr-body.md",
   "automation/materialize-pr-helper.mjs",
 ];

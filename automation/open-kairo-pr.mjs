@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
  * Open PR cursor/ongoing-development-work-6657 → main (idempotent).
- * Without GH_TOKEN/GITHUB_TOKEN, prints compare URL JSON and exits 0.
+ * Without a token (env or Cursor git config), prints compare URL JSON and exits 0.
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveGithubToken } from "./github-token.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = "vladislav23811/CHERRYAI";
@@ -15,7 +16,59 @@ const BASE = "main";
 const COMPARE = `https://github.com/${REPO}/compare/${BASE}...${HEAD}?expand=1`;
 
 function token() {
-  return (process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "").trim();
+  return resolveGithubToken();
+}
+
+async function apiJson(path, { method = "GET", body } = {}) {
+  const t = token();
+  if (!t) throw new Error("no_github_token");
+  const res = await fetch(`https://api.github.com${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${t}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "User-Agent": "cherryai-automation-open-pr",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json;
+  try {
+    json = text ? JSON.parse(text) : {};
+  } catch {
+    json = { raw: text.slice(0, 200) };
+  }
+  return { ok: res.ok, status: res.status, json };
+}
+
+async function existingPrUrlApi() {
+  const q = encodeURIComponent(`repo:${REPO} is:pr is:open head:${HEAD}`);
+  const { ok, status, json } = await apiJson(`/search/issues?q=${q}&per_page=1`);
+  if (!ok) {
+    const msg = json.message ?? `http_${status}`;
+    if (/Resource not accessible by integration/i.test(msg)) return { blocked: true, msg };
+    return { blocked: false, error: msg };
+  }
+  const item = json.items?.[0];
+  return { blocked: false, url: item?.html_url ?? null };
+}
+
+async function createPrApi() {
+  const { ok, status, json } = await apiJson(`/repos/${REPO}/pulls`, {
+    method: "POST",
+    body: {
+      title: "Kairo v0.4.1",
+      head: HEAD,
+      base: BASE,
+      body: body(),
+    },
+  });
+  if (!ok) {
+    const msg = json.message ?? `http_${status}`;
+    throw new Error(msg);
+  }
+  return json.html_url;
 }
 
 function body() {
@@ -42,10 +95,16 @@ function existingPrUrl() {
   }
 }
 
-function main() {
+async function main() {
   const found = existingPrUrl();
   if (found) {
     console.log(JSON.stringify({ ok: true, action: "exists", url: found }, null, 2));
+    return;
+  }
+
+  const viaApi = await existingPrUrlApi();
+  if (viaApi.url) {
+    console.log(JSON.stringify({ ok: true, action: "exists", url: viaApi.url, via: "api" }, null, 2));
     return;
   }
 
@@ -66,6 +125,18 @@ function main() {
         ),
       );
       return;
+    }
+  }
+
+  try {
+    const url = await createPrApi();
+    console.log(JSON.stringify({ ok: true, action: "created", url, via: "api" }, null, 2));
+    return;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!/Resource not accessible by integration|createPullRequest|no_github_token/i.test(msg)) {
+      console.log(JSON.stringify({ ok: false, action: "error", compare: COMPARE, error: msg, via: "api" }, null, 2));
+      process.exit(1);
     }
   }
 
@@ -101,4 +172,7 @@ function main() {
   }
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
