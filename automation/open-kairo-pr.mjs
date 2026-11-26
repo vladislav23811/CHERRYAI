@@ -14,6 +14,23 @@ const REPO = "vladislav23811/CHERRYAI";
 const HEAD = "cursor/ongoing-development-work-6657";
 const BASE = "main";
 const COMPARE = `https://github.com/${REPO}/compare/${BASE}...${HEAD}?expand=1`;
+const REPO_ROOT = path.join(__dirname, "..");
+
+function gitSha(args) {
+  try {
+    return execFileSync("git", args, { encoding: "utf8", cwd: REPO_ROOT, stdio: ["ignore", "pipe", "ignore"] }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Branch tip and latest commit that touched kairo/ (GHA Kairo head when green). */
+function branchMeta() {
+  return {
+    head_sha: gitSha(["rev-parse", "HEAD"]),
+    kairo_path_head_sha: gitSha(["log", "-1", "--format=%H", "HEAD", "--", "kairo/"]),
+  };
+}
 
 function token() {
   return resolveGithubToken();
@@ -103,6 +120,7 @@ function manualCompare(hint) {
         action: "manual",
         compare: COMPARE,
         hint,
+        ...branchMeta(),
       },
       null,
       2,
@@ -111,9 +129,10 @@ function manualCompare(hint) {
 }
 
 async function main() {
+  const meta = branchMeta();
   const found = existingPrUrl();
   if (found) {
-    console.log(JSON.stringify({ ok: true, action: "exists", url: found }, null, 2));
+    console.log(JSON.stringify({ ok: true, action: "exists", url: found, ...meta }, null, 2));
     return;
   }
 
@@ -121,7 +140,7 @@ async function main() {
   if (t) {
     const viaApi = await existingPrUrlApi();
     if (viaApi.url) {
-      console.log(JSON.stringify({ ok: true, action: "exists", url: viaApi.url, via: "api" }, null, 2));
+      console.log(JSON.stringify({ ok: true, action: "exists", url: viaApi.url, via: "api", ...meta }, null, 2));
       return;
     }
     if (viaApi.blocked) {
@@ -145,12 +164,12 @@ async function main() {
 
   try {
     const url = await createPrApi();
-    console.log(JSON.stringify({ ok: true, action: "created", url, via: "api" }, null, 2));
+    console.log(JSON.stringify({ ok: true, action: "created", url, via: "api", ...meta }, null, 2));
     return;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (!/Resource not accessible by integration|createPullRequest|no_github_token/i.test(msg)) {
-      console.log(JSON.stringify({ ok: false, action: "error", compare: COMPARE, error: msg, via: "api" }, null, 2));
+      console.log(JSON.stringify({ ok: false, action: "error", compare: COMPARE, error: msg, via: "api", ...meta }, null, 2));
       process.exit(1);
     }
   }
@@ -164,7 +183,7 @@ async function main() {
         env: ghEnv(),
       },
     ).trim();
-    console.log(JSON.stringify({ ok: true, action: "created", url }, null, 2));
+    console.log(JSON.stringify({ ok: true, action: "created", url, ...meta }, null, 2));
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     const integration =
@@ -177,8 +196,9 @@ async function main() {
               action: "manual",
               compare: COMPARE,
               hint: "Hosted gh token cannot createPullRequest; open compare URL in browser or use owner PAT",
+              ...meta,
             }
-          : { ok: false, action: "error", compare: COMPARE, error: msg },
+          : { ok: false, action: "error", compare: COMPARE, error: msg, ...meta },
         null,
         2,
       ),
