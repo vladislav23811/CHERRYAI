@@ -66,3 +66,4 @@ See `kairo/README.md` and `kairo/v0.4.1-spec.md`. CI from repo root: `npm run ka
 - [ ] Open PR → `main` via compare URL or owner PAT (`npm run automation:open-kairo-pr`)
 - [ ] Tauri desktop shell (deferred)
 - [x] v1.0.0 bundle signing scaffold (`KAIRO_SIGN_PRIVATE_KEY`, `scripts/bundle-sign.mjs`, optional `kairo:ci` probe)
+- [x] CI Ed25519 bundle sign/verify roundtrip (`kairo-validate` ephemeral-key probe)

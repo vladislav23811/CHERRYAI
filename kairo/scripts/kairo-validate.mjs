@@ -4,7 +4,7 @@
  * Spawns UI on 14746 (vault off) and 14747 (vault on) with KAIRO_BACKEND=smoke.
  */
 import { spawn } from "node:child_process";
-import { createHash, createPublicKey } from "node:crypto";
+import { createHash, createPublicKey, generateKeyPairSync } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +14,7 @@ import {
   signBundleFromEnv,
   verifyBundleFromEnv,
   verifyBundleSignature,
+  writeBundleSignature,
 } from "./bundle-sign.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -292,6 +293,14 @@ probe("bundle sha256", async () => {
   if (!fs.existsSync(bundleTar) || sha256File(bundleTar).length !== 64) {
     throw new Error("release tarball missing or invalid after tar");
   }
+});
+
+probe("bundle sign (roundtrip)", async () => {
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const sigPath = path.join(workDir, "roundtrip.sig.json");
+  writeBundleSignature(bundleTar, privateKey, sigPath);
+  verifyBundleSignature(bundleTar, publicKey, sigPath);
+  fs.rmSync(sigPath, { force: true });
 });
 
 probe("bundle sign (optional)", async () => {
