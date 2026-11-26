@@ -23,14 +23,18 @@ function body() {
   return fs.readFileSync(p, "utf8");
 }
 
-function existingPrUrl() {
+function ghEnv() {
   const t = token();
-  if (!t) return null;
+  if (!t) return process.env;
+  return { ...process.env, GH_TOKEN: t, GITHUB_TOKEN: t };
+}
+
+function existingPrUrl() {
   try {
     const out = execFileSync(
       "gh",
       ["pr", "list", "--head", HEAD, "--base", BASE, "--json", "url", "--jq", ".[0].url"],
-      { encoding: "utf8", env: { ...process.env, GH_TOKEN: t, GITHUB_TOKEN: t } },
+      { encoding: "utf8", env: ghEnv() },
     ).trim();
     return out || null;
   } catch {
@@ -45,21 +49,24 @@ function main() {
     return;
   }
 
-  const t = token();
-  if (!t) {
-    console.log(
-      JSON.stringify(
-        {
-          ok: true,
-          action: "manual",
-          compare: COMPARE,
-          hint: "Set GH_TOKEN or GITHUB_TOKEN with repo scope, then re-run npm run automation:open-kairo-pr",
-        },
-        null,
-        2,
-      ),
-    );
-    return;
+  if (!token()) {
+    try {
+      execFileSync("gh", ["auth", "status"], { encoding: "utf8", stdio: "pipe", env: ghEnv() });
+    } catch {
+      console.log(
+        JSON.stringify(
+          {
+            ok: true,
+            action: "manual",
+            compare: COMPARE,
+            hint: "Run gh auth login or set GH_TOKEN/GITHUB_TOKEN, then re-run npm run automation:open-kairo-pr",
+          },
+          null,
+          2,
+        ),
+      );
+      return;
+    }
   }
 
   try {
@@ -68,20 +75,29 @@ function main() {
       ["pr", "create", "--base", BASE, "--head", HEAD, "--title", "Kairo v0.4.1", "--body-file", path.join(__dirname, "kairo-pr-body.md")],
       {
         encoding: "utf8",
-        env: { ...process.env, GH_TOKEN: t, GITHUB_TOKEN: t },
+        env: ghEnv(),
       },
     ).trim();
     console.log(JSON.stringify({ ok: true, action: "created", url }, null, 2));
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    const integration =
+      /Resource not accessible by integration|createPullRequest/i.test(msg);
     console.log(
       JSON.stringify(
-        { ok: false, action: "error", compare: COMPARE, error: msg, bodyPreview: body().slice(0, 120) },
+        integration
+          ? {
+              ok: true,
+              action: "manual",
+              compare: COMPARE,
+              hint: "Hosted gh token cannot createPullRequest; open compare URL in browser or use owner PAT",
+            }
+          : { ok: false, action: "error", compare: COMPARE, error: msg },
         null,
         2,
       ),
     );
-    process.exit(1);
+    process.exit(integration ? 0 : 1);
   }
 }
 
