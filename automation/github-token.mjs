@@ -10,7 +10,10 @@ export function tokenFromEnv() {
 export function tokenFromGitConfig() {
   let lines;
   try {
-    lines = execFileSync("git", ["config", "--global", "-l"], { encoding: "utf8" }).split("\n");
+    lines = execFileSync("git", ["config", "--global", "-l"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).split("\n");
   } catch {
     return "";
   }

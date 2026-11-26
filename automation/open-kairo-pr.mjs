@@ -87,7 +87,7 @@ function existingPrUrl() {
     const out = execFileSync(
       "gh",
       ["pr", "list", "--head", HEAD, "--base", BASE, "--json", "url", "--jq", ".[0].url"],
-      { encoding: "utf8", env: ghEnv() },
+      { encoding: "utf8", env: ghEnv(), stdio: ["ignore", "pipe", "ignore"] },
     ).trim();
     return out || null;
   } catch {
