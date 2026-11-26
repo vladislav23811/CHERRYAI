@@ -16,7 +16,12 @@ def collect_diffs(obj, out: list[tuple[str, str]]) -> None:
             m = re.search(r"\+\+\+ b?//?(.+)", ds)
             if m:
                 fp = m.group(1).strip()
-                for prefix in ("/agent/CHERRYAI/", "agent/CHERRYAI/"):
+                for prefix in (
+                    "/agent/repos/CHERRYAI/",
+                    "agent/repos/CHERRYAI/",
+                    "/agent/CHERRYAI/",
+                    "agent/CHERRYAI/",
+                ):
                     if fp.startswith(prefix):
                         fp = fp[len(prefix) :]
                         break
@@ -29,8 +34,9 @@ def collect_diffs(obj, out: list[tuple[str, str]]) -> None:
 
 
 def normalize_patch(ds: str) -> str:
-    ds = ds.replace("--- a//agent/CHERRYAI/", "--- a/")
-    ds = ds.replace("+++ b//agent/CHERRYAI/", "+++ b/")
+    for stem in ("agent/repos/CHERRYAI", "agent/CHERRYAI"):
+        ds = ds.replace(f"--- a//{stem}/", "--- a/")
+        ds = ds.replace(f"+++ b//{stem}/", "+++ b/")
     ds = ds.replace("--- /dev/null", "--- /dev/null")
     ds = ds.replace("+++ b//", "+++ b/")
     if not ds.endswith("\n"):

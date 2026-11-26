@@ -21,6 +21,8 @@
     "wiki:sync": "node scripts/sync-github-wiki.mjs",
     "validate:all": "npm run rules:validate && npm run rules:doctor",
     "validate:ci": "npm run validate:all",
-    "kairo:ci": "npm --prefix kairo ci && npm --prefix kairo run kairo:ci"
+    "kairo:ci": "npm --prefix kairo ci && npm --prefix kairo run kairo:ci",
+    "automation:open-kairo-pr": "node automation/open-kairo-pr.mjs",
+    "automation:materialize-pr": "node automation/materialize-pr-helper.mjs"
   }
 }

@@ -138,6 +138,17 @@ The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` /
 
 **CI:** from repo root, `npm run kairo:ci` (build + `scripts/kairo-validate.mjs`). See `v0.4.1-spec.md`.
 
+### Orbit vault HTTP API
+
+When `KAIRO_VAULT_DIR` is set, archived orbits are stored as JSON files (`*.orbit.json`) on disk. `GET /health` and `GET /api/meta` expose `vault_enabled: boolean`.
+
+| Route | Vault off | Vault on |
+| ----- | --------- | -------- |
+| `GET /api/vault/orbits` | 503 | `{ vault_enabled, orbits[] }` |
+| `POST /api/vault/orbits` | 503 | 201 + orbit record |
+| `GET /api/vault/orbits/:id` | 503 | 200 / 404 |
+| `DELETE /api/vault/orbits/:id` | 503 | 204 / 404 |
+
 Markdown rendering uses **vendored** `marked` + `dompurify` copied into `dist/static/vendor/` on `npm run build` — no CDN required. The server exposes **`GET /vendor/*`** (allowlisted), **`GET /api/meta`**, **`GET /health`**, **`GET /manifest.webmanifest`**, **`GET /favicon.svg`**, and **`GET /sw.js`**. A **service worker** caches the shell (`/`, `/vendor/*`, manifest, icon) for offline reloads (API/streaming still needs the server). The UI persists **model**, **system preamble**, and **session id** in **`localStorage`** (Forget orbit clears the stored session link).
 
 ## CLI commands
