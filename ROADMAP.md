@@ -63,6 +63,6 @@ See `kairo/README.md` and `kairo/v0.4.1-spec.md`. CI from repo root: `npm run ka
 
 ### Kairo next
 
-- [ ] Push `cursor/ongoing-development-work-6657` and open PR → `main` (needs `GITHUB_TOKEN` / `GH_TOKEN` on Cloud Agent environment)
+- [ ] Open PR → `main` via compare URL or owner PAT (`npm run automation:open-kairo-pr`)
 - [ ] Tauri desktop shell (deferred)
-- [ ] v1.0.0 bundle signing (`KAIRO_SIGN_PRIVATE_KEY`)
+- [x] v1.0.0 bundle signing scaffold (`KAIRO_SIGN_PRIVATE_KEY`, `scripts/bundle-sign.mjs`, optional `kairo:ci` probe)

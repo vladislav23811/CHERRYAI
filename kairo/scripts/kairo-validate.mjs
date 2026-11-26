@@ -4,11 +4,17 @@
  * Spawns UI on 14746 (vault off) and 14747 (vault on) with KAIRO_BACKEND=smoke.
  */
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, createPublicKey } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import {
+  loadPrivateKey,
+  signBundleFromEnv,
+  verifyBundleFromEnv,
+  verifyBundleSignature,
+} from "./bundle-sign.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const kairoRoot = path.join(__dirname, "..");
@@ -286,6 +292,23 @@ probe("bundle sha256", async () => {
   if (!fs.existsSync(bundleTar) || sha256File(bundleTar).length !== 64) {
     throw new Error("release tarball missing or invalid after tar");
   }
+});
+
+probe("bundle sign (optional)", async () => {
+  const priv = process.env.KAIRO_SIGN_PRIVATE_KEY?.trim();
+  const pub = process.env.KAIRO_SIGN_PUBLIC_KEY?.trim();
+  if (!priv && !pub) return;
+  const sigPath = `${bundleTar}.sig.json`;
+  if (priv) {
+    signBundleFromEnv(bundleTar, sigPath);
+    if (pub) {
+      verifyBundleFromEnv(bundleTar, sigPath);
+    } else {
+      verifyBundleSignature(bundleTar, createPublicKey(loadPrivateKey(priv)), sigPath);
+    }
+    return;
+  }
+  verifyBundleFromEnv(bundleTar, sigPath);
 });
 
 probe("kairo version cli", async () => {

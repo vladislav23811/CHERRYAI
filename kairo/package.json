@@ -13,7 +13,9 @@
     "start:mcp": "node dist/index.js",
     "start:ui": "node dist/cli.js serve",
     "prepublishOnly": "npm run build",
-    "kairo:ci": "npm run build && node scripts/kairo-validate.mjs"
+    "kairo:ci": "npm run build && node scripts/kairo-validate.mjs",
+    "bundle:sign": "node scripts/bundle-sign.mjs",
+    "bundle:verify": "node scripts/bundle-sign.mjs verify"
   },
   "keywords": [
     "mcp",

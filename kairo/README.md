@@ -174,6 +174,8 @@ kairo --help
 | `KAIRO_MODEL` | _(first tag)_ | Fallback model id |
 | `KAIRO_SESSION_DIR` | _(unset)_ | Optional persistence dir |
 | `KAIRO_WORKSPACE` | _(unset)_ | Extra workspace roots for MCP file tools |
+| `KAIRO_SIGN_PRIVATE_KEY` | _(unset)_ | Optional PKCS#8 PEM or base64 Ed25519 key — signs `kairo-bundle.tar.gz` during `kairo:ci` / `npm run bundle:sign` |
+| `KAIRO_SIGN_PUBLIC_KEY` | _(unset)_ | Optional verify key; with private key set, CI self-verifies the release signature |
 
 ## Next explosions
 
