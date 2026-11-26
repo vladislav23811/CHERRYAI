@@ -95,6 +95,21 @@ function existingPrUrl() {
   }
 }
 
+function manualCompare(hint) {
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        action: "manual",
+        compare: COMPARE,
+        hint,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function main() {
   const found = existingPrUrl();
   if (found) {
@@ -102,27 +117,27 @@ async function main() {
     return;
   }
 
-  const viaApi = await existingPrUrlApi();
-  if (viaApi.url) {
-    console.log(JSON.stringify({ ok: true, action: "exists", url: viaApi.url, via: "api" }, null, 2));
-    return;
+  const t = token();
+  if (t) {
+    const viaApi = await existingPrUrlApi();
+    if (viaApi.url) {
+      console.log(JSON.stringify({ ok: true, action: "exists", url: viaApi.url, via: "api" }, null, 2));
+      return;
+    }
+    if (viaApi.blocked) {
+      manualCompare(
+        "Hosted token cannot search issues; open compare URL in browser or use owner PAT",
+      );
+      return;
+    }
   }
 
-  if (!token()) {
+  if (!t) {
     try {
       execFileSync("gh", ["auth", "status"], { encoding: "utf8", stdio: "pipe", env: ghEnv() });
     } catch {
-      console.log(
-        JSON.stringify(
-          {
-            ok: true,
-            action: "manual",
-            compare: COMPARE,
-            hint: "Run gh auth login or set GH_TOKEN/GITHUB_TOKEN, then re-run npm run automation:open-kairo-pr",
-          },
-          null,
-          2,
-        ),
+      manualCompare(
+        "Run gh auth login or set GH_TOKEN/GITHUB_TOKEN, then re-run npm run automation:open-kairo-pr",
       );
       return;
     }
@@ -173,6 +188,11 @@ async function main() {
 }
 
 main().catch((e) => {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/no_github_token/i.test(msg)) {
+    manualCompare("Set GH_TOKEN/GITHUB_TOKEN or configure git url.* token, then re-run npm run automation:open-kairo-pr");
+    return;
+  }
   console.error(e);
   process.exit(1);
 });
