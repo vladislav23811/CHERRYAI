@@ -138,6 +138,8 @@ The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` /
 
 **CI:** from repo root, `npm run kairo:ci` (build + `scripts/kairo-validate.mjs`). See `v0.4.1-spec.md`.
 
+**Release bundle:** `kairo:ci` builds a pinned-content tarball and runs an ephemeral Ed25519 sign/verify roundtrip (no secrets). Set `KAIRO_SIGN_PRIVATE_KEY` to also sign `kairo-bundle.tar.gz` for distribution; `npm run bundle:sign` / `bundle:verify` in this folder. Details in `v0.4.1-spec.md`.
+
 ### Orbit vault HTTP API
 
 When `KAIRO_VAULT_DIR` is set, archived orbits are stored as JSON files (`*.orbit.json`) on disk. `GET /health` and `GET /api/meta` expose `vault_enabled: boolean`.
