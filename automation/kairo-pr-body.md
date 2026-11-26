@@ -6,7 +6,7 @@ Kairo **v0.4.1** on `cursor/ongoing-development-work-6657`: smoke inference back
 
 - [ ] `npm run kairo:ci` (**38/38** probes, incl. Ed25519 bundle sign roundtrip)
 - [ ] `npm run validate:all`
-- [ ] GitHub Actions **Kairo** workflow green on this branch (head `7272cf7`+)
+- [x] GitHub Actions **Kairo** workflow green on `bd6b731` ([run](https://github.com/vladislav23811/CHERRYAI/actions/runs/45815912510))
 
 ## Compare
 
