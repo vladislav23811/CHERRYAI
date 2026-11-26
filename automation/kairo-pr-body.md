@@ -4,9 +4,9 @@ Kairo **v0.4.1** on `cursor/ongoing-development-work-6657`: smoke inference back
 
 ## Test plan
 
-- [x] `npm run kairo:ci` (**38/38** probes on `d6fe1b8`, incl. Ed25519 bundle sign roundtrip)
-- [x] `npm run validate:all` (local, `d6fe1b8`)
-- [x] GitHub Actions **Kairo** workflow green on `bd6b731` ([run](https://github.com/vladislav23811/CHERRYAI/actions/runs/45815912510))
+- [x] `npm run kairo:ci` (**38/38** probes on branch head, incl. Ed25519 bundle sign roundtrip)
+- [x] `npm run validate:all` (local, branch head)
+- [x] GitHub Actions **Kairo** workflow green on `bd6b731` ([run](https://github.com/vladislav23811/CHERRYAI/actions/runs/45815912510)); prior kairo-path push re-triggers GHA on head
 
 ## Compare
 

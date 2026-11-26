@@ -136,7 +136,7 @@ Environment:
 
 The UI uses the **same** `KAIRO_BACKEND` / `KAIRO_OLLAMA_*` / `KAIRO_OPENAI_*` / `KAIRO_MODEL` env as MCP. Set `KAIRO_BACKEND=smoke` for deterministic probes without a local LLM.
 
-**CI:** from repo root, `npm run kairo:ci` (build + `scripts/kairo-validate.mjs`). See `v0.4.1-spec.md`.
+**CI:** from repo root, `npm run kairo:ci` (build + `scripts/kairo-validate.mjs`). See `v0.4.1-spec.md`. **GHA** runs on pushes that touch `kairo/**` (or **workflow_dispatch** on the Kairo workflow); automation-only commits on the dev branch should still run `kairo:ci` locally before merge.
 
 **Release bundle:** `kairo:ci` builds a pinned-content tarball and runs an ephemeral Ed25519 sign/verify roundtrip (no secrets). Set `KAIRO_SIGN_PRIVATE_KEY` to also sign `kairo-bundle.tar.gz` for distribution; `npm run bundle:sign` / `bundle:verify` in this folder. Details in `v0.4.1-spec.md`.
 
