@@ -26,9 +26,15 @@ function gitSha(args) {
 
 /** Branch tip and latest commit that touched kairo/ (GHA Kairo head when green). */
 function branchMeta() {
+  const head_sha = gitSha(["rev-parse", "HEAD"]);
+  const kairo_path_head_sha = gitSha(["log", "-1", "--format=%H", "HEAD", "--", "kairo/"]);
   return {
-    head_sha: gitSha(["rev-parse", "HEAD"]),
-    kairo_path_head_sha: gitSha(["log", "-1", "--format=%H", "HEAD", "--", "kairo/"]),
+    head_sha,
+    kairo_path_head_sha,
+    /** True when tip is ahead of the newest kairo/** commit (automation-only; GHA did not run on tip). */
+    kairo_path_behind_tip: Boolean(
+      head_sha && kairo_path_head_sha && head_sha !== kairo_path_head_sha,
+    ),
   };
 }
 
