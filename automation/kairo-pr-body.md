@@ -4,9 +4,9 @@ Kairo **v0.4.1** on `cursor/ongoing-development-work-6657`: smoke inference back
 
 ## Test plan
 
-- [x] `npm run kairo:ci` (**38/38** probes on branch head, incl. Ed25519 bundle sign roundtrip; re-verified 2026-11-27 19:00 UTC)
-- [x] `npm run validate:all` (local, kairo path @ `5577ac0`)
-- [x] GitHub Actions **Kairo** workflow green on `5577ac0` ([run](https://github.com/vladislav23811/CHERRYAI/actions/runs/46053877352)); automation docs commit ahead of kairo path (`kairo_path_behind_tip: true`, branch head @ `8924f59`)
+- [x] `npm run kairo:ci` (**38/38** probes on branch head, incl. Ed25519 bundle sign roundtrip; re-verified 2026-11-27 20:00 UTC)
+- [x] `npm run validate:all` (local, kairo path @ `33dad9f`)
+- [x] GitHub Actions **Kairo** workflow green on `33dad9f` ([run](https://github.com/vladislav23811/CHERRYAI/actions/runs/46060863444)); automation docs commit ahead of kairo path (`kairo_path_behind_tip: true`, branch head @ `33dad9f`)
 - [x] `npm run automation:open-kairo-pr` returns compare URL (exit 0) when hosted token cannot create PR
 
 ## Compare
